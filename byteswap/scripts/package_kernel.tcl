@@ -32,7 +32,6 @@ set_property core_revision 2 $core
 foreach up [ipx::get_user_parameters] {
     ipx::remove_user_parameter [get_property NAME $up] $core
 }
-#ipx::associate_bus_interfaces -busif m_axi_gmem -clock ap_clk $core
 ipx::associate_bus_interfaces -busif m00_axi -clock ap_clk $core
 ipx::associate_bus_interfaces -busif s_axi_control -clock ap_clk $core
 
@@ -110,28 +109,16 @@ set reg [::ipx::add_register "IP_ISR" $addr_block]
     set_property size           32                                        $reg
 
 # Set the IP registers of the core
-set reg [::ipx::add_register -quiet "a" $addr_block]
-    set_property description    "A Register"                              $reg
+set reg [::ipx::add_register -quiet "scalar00" $addr_block]
+    set_property description    "Kernel parameter scalar00"               $reg
     set_property address_offset 0x010                                     $reg
-    set_property size           [expr {8*8}]                              $reg
-    set regparam [::ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg]
-    set_property value          m00_axi                                $regparam
-set reg [::ipx::add_register -quiet "b" $addr_block]
-    set_property description    "B Register"                              $reg
-    set_property address_offset 0x01C                                     $reg
-    set_property size           [expr {8*8}]                              $reg
-    set regparam [::ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg]
-    set_property value          m00_axi                                $regparam
-set reg [::ipx::add_register -quiet "c" $addr_block]
-    set_property description    "C Register"                              $reg
-    set_property address_offset 0x028                                     $reg
-    set_property size           [expr {8*8}]                              $reg
-    set regparam [::ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg]
-    set_property value          m00_axi                                $regparam
-set reg [::ipx::add_register -quiet "length_r" $addr_block]
-    set_property description    "Length Register"                         $reg
-    set_property address_offset 0x034                                     $reg
     set_property size           [expr {4*8}]                              $reg
+set reg [::ipx::add_register -quiet "a" $addr_block]
+    set_property description    "Kernel parameter axi00"                  $reg
+    set_property address_offset 0x014                                     $reg
+    set_property size           [expr {8*8}]                              $reg
+    set regparam [::ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg]
+    set_property value          m00_axi                                $regparam
 
 set_property slave_memory_map_ref "s_axi_control" [::ipx::get_bus_interfaces -of $core "s_axi_control"]
 
