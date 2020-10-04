@@ -1,21 +1,21 @@
 // This is a generated file. Use and modify at your own risk.
 ////////////////////////////////////////////////////////////////////////////////
-// Description: Pipelined adder.  This is an adder with pipelines before and
-//   after the adder datapath.  The output is fed into a FIFO and prog_full is
-//   used to signal ready.  This design allows for high Fmax.
+// Description: Byte swapper. This module swaps the order of bytes, so the
+// least significant byte in a word, becomes the most significant.
 
 // default_nettype of none prevents implicit wire declaration.
 `default_nettype none
 `timescale 1ps / 1ps
 
-module rtl_kernel_wizard_1_example_adder #(
+module byteswap_swapper #(
   parameter integer C_AXIS_TDATA_WIDTH = 512, // Data width of both input and output data
-  parameter integer C_ADDER_BIT_WIDTH  = 32,
+  parameter integer C_WORD_BIT_WIDTH  = 32,
+  parameter integer C_BYTE_WIDTH = 8,
   parameter integer C_NUM_CLOCKS       = 1
 )
 (
 
-  input wire  [C_ADDER_BIT_WIDTH-1:0]   ctrl_constant,
+  input wire  [C_WORD_BIT_WIDTH-1:0]   ctrl_constant,
 
   input wire                             s_axis_aclk,
   input wire                             s_axis_areset,
@@ -34,7 +34,9 @@ module rtl_kernel_wizard_1_example_adder #(
 
 );
 
-localparam integer LP_NUM_LOOPS = C_AXIS_TDATA_WIDTH/C_ADDER_BIT_WIDTH;
+localparam integer LP_NUM_LOOPS = C_AXIS_TDATA_WIDTH/C_WORD_BIT_WIDTH;
+localparam integer LP_BYTE_WIDTH = 8;
+localparam integer LP_NUM_BYTES = C_WORD_BIT_WIDTH / LP_BYTE_WIDTH;
 localparam         LP_CLOCKING_MODE = C_NUM_CLOCKS == 1 ? "common_clock" : "independent_clock";
 /////////////////////////////////////////////////////////////////////////////
 // Variables
@@ -44,9 +46,10 @@ reg                              d1_tready = 1'b0;
 reg   [C_AXIS_TDATA_WIDTH-1:0]   d1_tdata;
 reg   [C_AXIS_TDATA_WIDTH/8-1:0] d1_tkeep;
 reg                              d1_tlast;
-reg   [C_ADDER_BIT_WIDTH-1:0]    d1_constant;
+reg   [C_WORD_BIT_WIDTH-1:0]          d1_constant;
 
 integer i;
+integer j;
 
 reg                              d2_tvalid = 1'b0;
 reg   [C_AXIS_TDATA_WIDTH-1:0]   d2_tdata;
@@ -74,11 +77,14 @@ always @(posedge s_axis_aclk) begin
   d1_constant <= ctrl_constant;
 end
 
-// Adder function
+// Swapper function
 always @(posedge s_axis_aclk) begin
-  for (i = 0; i < LP_NUM_LOOPS; i = i + 1) begin
-    d2_tdata[i*C_ADDER_BIT_WIDTH+:C_ADDER_BIT_WIDTH] <= d1_tdata[C_ADDER_BIT_WIDTH*i+:C_ADDER_BIT_WIDTH] + d1_constant;
-  end
+    for (i = 0; i < LP_NUM_LOOPS; i = i + 1) begin
+        for (j = 0; j < LP_NUM_BYTES;  j = j + 1) begin
+            d2_tdata[(i*C_WORD_BIT_WIDTH)+(j*LP_BYTE_WIDTH)+:LP_BYTE_WIDTH] <=
+                d1_tdata[(C_WORD_BIT_WIDTH*(i+1))-((j+1)*LP_BYTE_WIDTH)+:LP_BYTE_WIDTH];
+        end
+    end
 end
 
 // Register inputs to fifo

@@ -1,8 +1,8 @@
 // This is a generated file. Use and modify at your own risk.
-//////////////////////////////////////////////////////////////////////////////// 
+////////////////////////////////////////////////////////////////////////////////
 // default_nettype of none prevents implicit wire declaration.
 `default_nettype none
-module rtl_kernel_wizard_1_example #(
+module byteswap #(
   parameter integer C_M00_AXI_ADDR_WIDTH = 64 ,
   parameter integer C_M00_AXI_DATA_WIDTH = 512
 )
@@ -36,7 +36,7 @@ module rtl_kernel_wizard_1_example #(
   output wire                              ap_done        ,
   output wire                              ap_ready       ,
   input  wire [32-1:0]                     scalar00       ,
-  input  wire [64-1:0]                     axi00_ptr0     
+  input  wire [64-1:0]                     axi00_ptr0
 );
 
 
@@ -110,14 +110,14 @@ assign ap_done = &ap_done_r;
 // Ready Logic (non-pipelined case)
 assign ap_ready = ap_done;
 
-// Vadd example
-rtl_kernel_wizard_1_example_vadd #(
+// Vswap example
+byteswap_vswap #(
   .C_M_AXI_ADDR_WIDTH ( C_M00_AXI_ADDR_WIDTH ),
   .C_M_AXI_DATA_WIDTH ( C_M00_AXI_DATA_WIDTH ),
-  .C_ADDER_BIT_WIDTH  ( 32                   ),
+  .C_WORD_BIT_WIDTH   ( 32                   ),
   .C_XFER_SIZE_WIDTH  ( 32                   )
 )
-inst_example_vadd_m00_axi (
+inst_vswap_m00_axi (
   .aclk                    ( ap_clk                  ),
   .areset                  ( areset                  ),
   .kernel_clk              ( ap_clk                  ),
@@ -149,5 +149,5 @@ inst_example_vadd_m00_axi (
 );
 
 
-endmodule : rtl_kernel_wizard_1_example
+endmodule : byteswap
 `default_nettype wire

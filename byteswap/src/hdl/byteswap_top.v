@@ -1,10 +1,10 @@
 // This is a generated file. Use and modify at your own risk.
-//////////////////////////////////////////////////////////////////////////////// 
+////////////////////////////////////////////////////////////////////////////////
 // default_nettype of none prevents implicit wire declaration.
 `default_nettype none
 `timescale 1 ns / 1 ps
 // Top level of the kernel. Do not modify module name, parameters or ports.
-module rtl_kernel_wizard_1 #(
+module byteswap_top #(
   parameter integer C_S_AXI_CONTROL_ADDR_WIDTH = 12 ,
   parameter integer C_S_AXI_CONTROL_DATA_WIDTH = 32 ,
   parameter integer C_M00_AXI_ADDR_WIDTH       = 64 ,
@@ -21,7 +21,7 @@ module rtl_kernel_wizard_1 #(
   // features that are not necessary. When adapting AXI4 masters within the RTL
   // kernel that have signals not declared below, it is suitable to add the
   // signals to the declarations below to connect them to the AXI4 Master.
-  // 
+  //
   // List of ommited signals - effect
   // -------------------------------
   // ID - Transaction ID are used for multithreading and out of order
@@ -39,7 +39,7 @@ module rtl_kernel_wizard_1 #(
   // REGION - Has no effect in current acceleration platforms.
   // USER - Has no effect in current acceleration platforms.
   // RESP - Not useful in most acceleration platforms.
-  // 
+  //
   // AXI4 master interface m00_axi
   output wire                                    m00_axi_awvalid      ,
   input  wire                                    m00_axi_awready      ,
@@ -78,7 +78,7 @@ module rtl_kernel_wizard_1 #(
   output wire                                    s_axi_control_bvalid ,
   input  wire                                    s_axi_control_bready ,
   output wire [2-1:0]                            s_axi_control_bresp  ,
-  output wire                                    interrupt            
+  output wire                                    interrupt
 );
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -108,7 +108,7 @@ end
 
 
 // AXI4-Lite slave interface
-rtl_kernel_wizard_1_control_s_axi #(
+byteswap_control_s_axi #(
   .C_S_AXI_ADDR_WIDTH ( C_S_AXI_CONTROL_ADDR_WIDTH ),
   .C_S_AXI_DATA_WIDTH ( C_S_AXI_CONTROL_DATA_WIDTH )
 )
@@ -147,11 +147,11 @@ inst_control_s_axi (
 ///////////////////////////////////////////////////////////////////////////////
 
 // Example RTL block.  Remove to insert custom logic.
-rtl_kernel_wizard_1_example #(
+byteswap #(
   .C_M00_AXI_ADDR_WIDTH ( C_M00_AXI_ADDR_WIDTH ),
   .C_M00_AXI_DATA_WIDTH ( C_M00_AXI_DATA_WIDTH )
 )
-inst_example (
+inst_byteswap (
   .ap_clk          ( ap_clk          ),
   .ap_rst_n        ( ap_rst_n        ),
   .m00_axi_awvalid ( m00_axi_awvalid ),

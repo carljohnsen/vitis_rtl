@@ -3,11 +3,11 @@
 // default_nettype of none prevents implicit wire declaration.
 `default_nettype none
 
-module rtl_kernel_wizard_1_example_vadd #(
+module byteswap_vswap #(
   parameter integer C_M_AXI_ADDR_WIDTH       = 64 ,
   parameter integer C_M_AXI_DATA_WIDTH       = 512,
   parameter integer C_XFER_SIZE_WIDTH        = 32,
-  parameter integer C_ADDER_BIT_WIDTH        = 32
+  parameter integer C_WORD_BIT_WIDTH         = 32
 )
 (
   // System Signals
@@ -40,7 +40,7 @@ module rtl_kernel_wizard_1_example_vadd #(
   output wire                                   ap_done            ,
   input wire [C_M_AXI_ADDR_WIDTH-1:0]           ctrl_addr_offset   ,
   input wire [C_XFER_SIZE_WIDTH-1:0]            ctrl_xfer_size_in_bytes,
-  input wire [C_ADDER_BIT_WIDTH-1:0]            ctrl_constant
+  input wire [C_WORD_BIT_WIDTH-1:0]             ctrl_constant
 );
 
 timeunit 1ps;
@@ -69,10 +69,10 @@ logic                          rd_tvalid;
 logic                          rd_tready;
 logic                          rd_tlast;
 logic [C_M_AXI_DATA_WIDTH-1:0] rd_tdata;
-// Adder stage
-logic                          adder_tvalid;
-logic                          adder_tready;
-logic [C_M_AXI_DATA_WIDTH-1:0] adder_tdata;
+// Swapper stage
+logic                          swapper_tvalid;
+logic                          swapper_tready;
+logic [C_M_AXI_DATA_WIDTH-1:0] swapper_tdata;
 
 // AXI write master stage
 logic                          write_done;
@@ -82,7 +82,7 @@ logic                          write_done;
 ///////////////////////////////////////////////////////////////////////////////
 
 // AXI4 Read Master, output format is an AXI4-Stream master, one stream per thread.
-rtl_kernel_wizard_1_example_axi_read_master #(
+byteswap_axi_read_master #(
   .C_M_AXI_ADDR_WIDTH  ( C_M_AXI_ADDR_WIDTH    ) ,
   .C_M_AXI_DATA_WIDTH  ( C_M_AXI_DATA_WIDTH    ) ,
   .C_XFER_SIZE_WIDTH   ( C_XFER_SIZE_WIDTH     ) ,
@@ -112,12 +112,12 @@ inst_axi_read_master (
   .m_axis_tdata            ( rd_tdata                )
 );
 
-rtl_kernel_wizard_1_example_adder #(
+byteswap_swapper #(
   .C_AXIS_TDATA_WIDTH ( C_M_AXI_DATA_WIDTH ) ,
-  .C_ADDER_BIT_WIDTH  ( C_ADDER_BIT_WIDTH  ) ,
+  .C_WORD_BIT_WIDTH   ( C_WORD_BIT_WIDTH   ) ,
   .C_NUM_CLOCKS       ( 1                  )
 )
-inst_adder  (
+inst_swapper  (
   .s_axis_aclk   ( kernel_clk                   ) ,
   .s_axis_areset ( kernel_rst                   ) ,
   .ctrl_constant ( ctrl_constant                ) ,
@@ -127,15 +127,15 @@ inst_adder  (
   .s_axis_tkeep  ( {C_M_AXI_DATA_WIDTH/8{1'b1}} ) ,
   .s_axis_tlast  ( rd_tlast                     ) ,
   .m_axis_aclk   ( kernel_clk                   ) ,
-  .m_axis_tvalid ( adder_tvalid                 ) ,
-  .m_axis_tready ( adder_tready                 ) ,
-  .m_axis_tdata  ( adder_tdata                  ) ,
+  .m_axis_tvalid ( swapper_tvalid               ) ,
+  .m_axis_tready ( swapper_tready               ) ,
+  .m_axis_tdata  ( swapper_tdata                ) ,
   .m_axis_tkeep  (                              ) , // Not used
   .m_axis_tlast  (                              )   // Not used
 );
 
 // AXI4 Write Master
-rtl_kernel_wizard_1_example_axi_write_master #(
+byteswap_axi_write_master #(
   .C_M_AXI_ADDR_WIDTH  ( C_M_AXI_ADDR_WIDTH    ) ,
   .C_M_AXI_DATA_WIDTH  ( C_M_AXI_DATA_WIDTH    ) ,
   .C_XFER_SIZE_WIDTH   ( C_XFER_SIZE_WIDTH     ) ,
@@ -162,13 +162,13 @@ inst_axi_write_master (
   .m_axi_bready            ( m_axi_bready            ) ,
   .s_axis_aclk             ( kernel_clk              ) ,
   .s_axis_areset           ( kernel_rst              ) ,
-  .s_axis_tvalid           ( adder_tvalid            ) ,
-  .s_axis_tready           ( adder_tready            ) ,
-  .s_axis_tdata            ( adder_tdata             )
+  .s_axis_tvalid           ( swapper_tvalid          ) ,
+  .s_axis_tready           ( swapper_tready          ) ,
+  .s_axis_tdata            ( swapper_tdata           )
 );
 
 assign ap_done = write_done;
 
-endmodule : rtl_kernel_wizard_1_example_vadd
+endmodule : byteswap_vswap
 `default_nettype wire
 

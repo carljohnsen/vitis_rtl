@@ -3,7 +3,7 @@
 // Copyright 1986-2020 Xilinx, Inc. All Rights Reserved.
 // ==============================================================
 `timescale 1ns/1ps
-module rtl_kernel_wizard_1_control_s_axi
+module byteswap_control_s_axi
 #(parameter
     C_S_AXI_ADDR_WIDTH = 6,
     C_S_AXI_DATA_WIDTH = 32

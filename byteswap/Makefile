@@ -1,3 +1,3 @@
 TARGET = hw_emu
-KERNEL = rtl_kernel_wizard_1
+KERNEL = byteswap_top
 include ../utils/utils.mk
