@@ -4,7 +4,7 @@
 // default_nettype of none prevents implicit wire declaration.
 `default_nettype none
 
-module rtl_kernel_wizard_1_example_counter #(
+module vadd_float_counter #(
   parameter integer C_WIDTH  = 4,
   parameter [C_WIDTH-1:0] C_INIT = {C_WIDTH{1'b0}}
 )
@@ -80,6 +80,6 @@ always @(posedge clk) begin
 end
 
 
-endmodule : rtl_kernel_wizard_1_example_counter
+endmodule : vadd_float_counter
 `default_nettype wire
 

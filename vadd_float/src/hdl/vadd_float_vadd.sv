@@ -3,7 +3,7 @@
 // default_nettype of none prevents implicit wire declaration.
 `default_nettype none
 
-module rtl_kernel_wizard_1_example_vadd #(
+module vadd_float_vadd #(
   parameter integer C_M_AXI_ADDR_WIDTH       = 64 ,
   parameter integer C_M_AXI_DATA_WIDTH       = 512,
   parameter integer C_XFER_SIZE_WIDTH        = 32,
@@ -82,7 +82,7 @@ logic                          write_done;
 ///////////////////////////////////////////////////////////////////////////////
 
 // AXI4 Read Master, output format is an AXI4-Stream master, one stream per thread.
-rtl_kernel_wizard_1_example_axi_read_master #(
+vadd_float_axi_read_master #(
   .C_M_AXI_ADDR_WIDTH  ( C_M_AXI_ADDR_WIDTH    ) ,
   .C_M_AXI_DATA_WIDTH  ( C_M_AXI_DATA_WIDTH    ) ,
   .C_XFER_SIZE_WIDTH   ( C_XFER_SIZE_WIDTH     ) ,
@@ -112,7 +112,7 @@ inst_axi_read_master (
   .m_axis_tdata            ( rd_tdata                )
 );
 
-rtl_kernel_wizard_1_example_adder #(
+vadd_float_adder #(
   .C_AXIS_TDATA_WIDTH ( C_M_AXI_DATA_WIDTH ) ,
   .C_ADDER_BIT_WIDTH  ( C_ADDER_BIT_WIDTH  ) ,
   .C_NUM_CLOCKS       ( 1                  )
@@ -135,7 +135,7 @@ inst_adder  (
 );
 
 // AXI4 Write Master
-rtl_kernel_wizard_1_example_axi_write_master #(
+vadd_float_axi_write_master #(
   .C_M_AXI_ADDR_WIDTH  ( C_M_AXI_ADDR_WIDTH    ) ,
   .C_M_AXI_DATA_WIDTH  ( C_M_AXI_DATA_WIDTH    ) ,
   .C_XFER_SIZE_WIDTH   ( C_XFER_SIZE_WIDTH     ) ,
@@ -169,6 +169,6 @@ inst_axi_write_master (
 
 assign ap_done = write_done;
 
-endmodule : rtl_kernel_wizard_1_example_vadd
+endmodule : vadd_float_vadd
 `default_nettype wire
 

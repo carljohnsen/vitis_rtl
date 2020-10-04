@@ -8,7 +8,7 @@
 `default_nettype none
 `timescale 1ps / 1ps
 
-module rtl_kernel_wizard_1_example_adder #(
+module vadd_float_adder #(
   parameter integer C_AXIS_TDATA_WIDTH = 512, // Data width of both input and output data
   parameter integer C_ADDER_BIT_WIDTH  = 32,
   parameter integer C_NUM_CLOCKS       = 1

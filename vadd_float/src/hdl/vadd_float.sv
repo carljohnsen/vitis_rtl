@@ -1,8 +1,8 @@
 // This is a generated file. Use and modify at your own risk.
-//////////////////////////////////////////////////////////////////////////////// 
+////////////////////////////////////////////////////////////////////////////////
 // default_nettype of none prevents implicit wire declaration.
 `default_nettype none
-module rtl_kernel_wizard_1_example #(
+module vadd_float #(
   parameter integer C_M00_AXI_ADDR_WIDTH = 64 ,
   parameter integer C_M00_AXI_DATA_WIDTH = 512
 )
@@ -36,7 +36,7 @@ module rtl_kernel_wizard_1_example #(
   output wire                              ap_done        ,
   output wire                              ap_ready       ,
   input  wire [32-1:0]                     scalar00       ,
-  input  wire [64-1:0]                     axi00_ptr0     
+  input  wire [64-1:0]                     axi00_ptr0
 );
 
 
@@ -111,7 +111,7 @@ assign ap_done = &ap_done_r;
 assign ap_ready = ap_done;
 
 // Vadd example
-rtl_kernel_wizard_1_example_vadd #(
+vadd_float_vadd #(
   .C_M_AXI_ADDR_WIDTH ( C_M00_AXI_ADDR_WIDTH ),
   .C_M_AXI_DATA_WIDTH ( C_M00_AXI_DATA_WIDTH ),
   .C_ADDER_BIT_WIDTH  ( 32                   ),
@@ -149,5 +149,5 @@ inst_example_vadd_m00_axi (
 );
 
 
-endmodule : rtl_kernel_wizard_1_example
+endmodule : vadd_float
 `default_nettype wire

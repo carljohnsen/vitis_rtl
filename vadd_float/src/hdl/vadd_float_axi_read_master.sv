@@ -49,7 +49,7 @@
 // default_nettype of none prevents implicit wire declaration.
 `default_nettype none
 
-module rtl_kernel_wizard_1_example_axi_read_master #(
+module vadd_float_axi_read_master #(
   // Set to the address width of the interface
   parameter integer C_M_AXI_ADDR_WIDTH  = 64,
 
@@ -249,7 +249,7 @@ always @(posedge aclk) begin
 end
 
 // Counts down the number of transactions to send.
-rtl_kernel_wizard_1_example_counter #(
+vadd_float_counter #(
   .C_WIDTH ( LP_TRANSACTION_CNTR_WIDTH         ) ,
   .C_INIT  ( {LP_TRANSACTION_CNTR_WIDTH{1'b0}} )
 )
@@ -271,7 +271,7 @@ assign ar_done = ar_final_transaction && arxfer;
 // Keeps track of the number of outstanding transactions. Stalls
 // when the value is reached so that the FIFO won't overflow.
 // If no FIFO present, then just limit at max outstanding transactions.
-rtl_kernel_wizard_1_example_counter #(
+vadd_float_counter #(
   .C_WIDTH ( LP_OUTSTANDING_CNTR_WIDTH                       ) ,
   .C_INIT  ( C_MAX_OUTSTANDING[0+:LP_OUTSTANDING_CNTR_WIDTH] )
 )
@@ -362,7 +362,7 @@ always_comb begin
   decr_r_transaction_cntr = rxfer & m_axi_rlast;
 end
 
-rtl_kernel_wizard_1_example_counter #(
+vadd_float_counter #(
   .C_WIDTH ( LP_TRANSACTION_CNTR_WIDTH         ) ,
   .C_INIT  ( {LP_TRANSACTION_CNTR_WIDTH{1'b0}} )
 )
@@ -378,7 +378,7 @@ inst_r_transaction_cntr (
   .is_zero    ( r_final_transaction           )
 );
 
-endmodule : rtl_kernel_wizard_1_example_axi_read_master
+endmodule : vadd_float_axi_read_master
 
 `default_nettype wire
 
