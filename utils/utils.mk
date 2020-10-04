@@ -10,6 +10,7 @@
 # Directories
 BUILD_DIR = build
 BIN_DIR = $(BUILD_DIR)/bin
+HLSLIB_DIR = ../hlslib
 LOG_DIR = logs
 OBJECTS_DIR = $(BUILD_DIR)/obj
 PKG_DIR = $(BUILD_DIR)/pkg
@@ -29,8 +30,8 @@ VIVADO = $(XILINX_VIVADO)/bin/vivado
 
 # Flags
 CFLAGS = -O0 -std=c++11
-INCLUDES = -I$(XILINX_XRT)/include -I$(XILINX_VIVADO)/include
-LIBS = -lOpenCL -lpthread -lstdc++ -lrt -Wall
+INCLUDES = -I$(XILINX_XRT)/include -I$(XILINX_VIVADO)/include -I$(HLSLIB_DIR)/include
+LIBS = -lOpenCL -lpthread -lstdc++11 -lrt -Wall
 LIB_DIRS = -L$(XILINX_XRT)/lib
 PLATFORM = xilinx_u250_xdma_201830_2
 VIVADO_LOG = -log $(LOG_DIR)/vivado.log -journal $(LOG_DIR)/vivado.jou
