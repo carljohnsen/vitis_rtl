@@ -13,16 +13,25 @@ source /opt/Xilinx/Vitis/2020.1/settings64.sh
 source /opt/xilinx/xrt/setup.sh
 export LIBRARY_PATH=/usr/lib/x86_64-linux-gnu
 ```
+Each project has its own `Makefile`. So to run either, `cd` into their directory and run one of the following commands:
 
-Then, to build a project:
+To check whether Xilinx Vivado can parse and elaborate the RTL code:
 ```
-cd $project
+make elaborate
+```
+
+To check whether Xilinx Vivado can synthesize the RTL code:
+```
+make synth
+```
+
+To build a project (both host and device code):
+```
 make build
 ```
 
 And to run a project:
 ```
-cd $project
 make run
 ```
 
@@ -35,5 +44,5 @@ make run
 - `utils.mk` - a library of commonly used Makefile rules and variables.
 - `host.cpp` - TODO a template host program containing most of the generic boilerplate OpenCL code.
 - `package_kernel.tcl` - TODO a template TCL script containing most of the generic boilerplate Vivado project TCL code.
-- `test_synthesis.tcl` - TODO a template TCL script for testing whether the RTL code can be synthesized. 
+- `test_synthesis.tcl` - TODO a template TCL script for testing whether the RTL code can be synthesized.
 - `empty_project` - TODO an empty project containing the basic requirements for a project, such as `Makefile` and folder structure.
