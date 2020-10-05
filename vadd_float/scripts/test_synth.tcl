@@ -14,11 +14,11 @@ add_files [glob $src_dir/*.v $src_dir/*.sv]
 
 create_ip -name floating_point -vendor xilinx.com -library ip -version 7.1 -module_name floating_point_0
 set_property -dict [list CONFIG.Add_Sub_Value {Add} CONFIG.Has_A_TLAST {true} CONFIG.Has_A_TUSER {false} CONFIG.Has_B_TLAST {true} CONFIG.Has_B_TUSER {false} CONFIG.RESULT_TLAST_Behv {OR_all_TLASTs}] [get_ips floating_point_0]
-#generate_target {instantiation_template} [get_files /home/carljohnsen/vivado/batch_synthesis_test/batch_synthesis_test.srcs/sources_1/ip/floating_point_0/floating_point_0.xci]
 
 update_compile_order -fileset sources_1
 update_compile_order -fileset sources_1
-synth_ip [get_ips -all floating_point_0]
+check_syntax
+synth_ip [get_ips]
 if { $::argc == 4 } {
     synth_design -top $top_file -rtl
 } else {
