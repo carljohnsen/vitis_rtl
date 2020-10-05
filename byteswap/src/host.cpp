@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
 
         // Compute the results
         expected_result[i] = 0;
-        for (int j = 0; j < 4; i++) {
+        for (int j = 0; j < 4; j++) {
             expected_result[i] |= ((input_data[i] >> (j*8)) & 0xFF) << ((3-j)*8);
         }
     }
