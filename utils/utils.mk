@@ -62,6 +62,7 @@ all: check_parameters build link
 clean:
 	rm -rf ./$(BUILD_DIR) ./_x ./$(LOG_DIR)
 	rm -f ./hs_err_pid* ./v++_* ./xcd.log ./xrc.log
+	rm -f ./profile_kernels.csv ./timeline_kernels.csv ./$(PLATFORM)-0-$(KERNEL)*
 
 build: check_parameters $(PACKAGED_KERNEL) $(OBJECTS) $(EMCONFIG)
 
