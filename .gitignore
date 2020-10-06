@@ -1,2 +1,8 @@
-*/**build/
-*/**logs/
+*/build/
+*/logs/
+
+*/profile_kernels.csv
+*/timeline_kernels.csv
+*/xcd.log
+*/xilinx_u250_xdma_*
+*/xrc.log
