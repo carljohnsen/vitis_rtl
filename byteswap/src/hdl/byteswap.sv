@@ -55,6 +55,7 @@ localparam integer LP_RD_MAX_OUTSTANDING = LP_BRAM_DEPTH / LP_AXI_BURST_LEN;
 localparam integer LP_WR_MAX_OUTSTANDING = 32;
 
 // Wires and Variables
+(* KEEP = "yes" *)
 logic                         areset = 1'b0;
 logic                         ap_start_r = 1'b0;
 logic                         ap_idle_r = 1'b1;

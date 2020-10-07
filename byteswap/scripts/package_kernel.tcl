@@ -116,7 +116,7 @@ set reg [::ipx::add_register -quiet "scalar00" $addr_block]
     set_property size           [expr {4*8}]                              $reg
 set reg [::ipx::add_register -quiet "a" $addr_block]
     set_property description    "Kernel parameter axi00"                  $reg
-    set_property address_offset 0x014                                     $reg
+    set_property address_offset 0x018                                     $reg
     set_property size           [expr {8*8}]                              $reg
     set regparam [::ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg]
     set_property value          m00_axi                                $regparam

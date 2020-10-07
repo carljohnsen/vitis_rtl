@@ -2,6 +2,7 @@
 `timescale 1ps / 1ps
 
 module byteswap_swapper #(
+    parameter integer C_NUM_CLOCKS = 1,
     parameter integer C_AXIS_TDATA_WIDTH = 512,
     parameter integer C_WORD_BIT_WIDTH   = 32,
     parameter integer C_BYTE_BIT_WIDTH   = 8
@@ -20,7 +21,8 @@ module byteswap_swapper #(
     input  wire                            m_axis_tready,
     output wire [C_AXIS_TDATA_WIDTH-1:0]   m_axis_tdata,
     output wire [C_AXIS_TDATA_WIDTH/8-1:0] m_axis_tkeep,
-    output wire                            m_axis_tlast
+    output wire                            m_axis_tlast,
+    input wire [31:0] ctrl_constant
 );
 
 // Local parameters
@@ -37,7 +39,7 @@ reg   [C_AXIS_TDATA_WIDTH/8-1:0] d1_tkeep;
 reg                              d1_tlast;
 
 reg                              d2_tvalid = 1'b0;
-reg                              d2_tready;
+reg                              d2_tready = 1'b0;
 reg   [C_AXIS_TDATA_WIDTH-1:0]   d2_tdata;
 reg   [C_AXIS_TDATA_WIDTH/8-1:0] d2_tkeep;
 reg                              d2_tlast;
@@ -52,7 +54,7 @@ integer j;
 // Register s_axis_interface
 always @(posedge s_axis_aclk) begin
   d1_tvalid <= s_axis_tvalid;
-  d1_tready <= d2_tready;
+  d1_tready <= s_axis_tready;
   d1_tdata  <= s_axis_tdata;
   d1_tkeep  <= s_axis_tkeep;
   d1_tlast  <= s_axis_tlast;
@@ -70,13 +72,13 @@ end
 
 // Register for m_axis_interface
 always @(posedge s_axis_aclk) begin
-    d2_tvalid <= d1_tvalid & d1_tready;
+    d2_tvalid <= d1_tvalid;// & d1_tready;
     d2_tready <= m_axis_tready;
     d2_tkeep  <= d1_tkeep;
     d2_tlast  <= d1_tlast;
 end
 
-assign s_axis_tready = d1_tready;
+assign s_axis_tready = d2_tready;
 assign m_axis_tvalid = d2_tvalid;
 assign m_axis_tdata  = d2_tdata;
 assign m_axis_tkeep  = d2_tkeep;

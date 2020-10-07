@@ -58,6 +58,7 @@ module byteswap_top #(
 );
 
 // Wires and variables
+(* DONT_TOUCH = "yes" *)
 reg areset = 1'b0;
 wire ap_start;
 wire ap_idle;
