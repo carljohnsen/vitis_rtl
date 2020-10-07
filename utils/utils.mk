@@ -14,6 +14,7 @@ HLSLIB_DIR = ../hlslib
 LOG_DIR = logs
 OBJECTS_DIR = $(BUILD_DIR)/obj
 PKG_DIR = $(BUILD_DIR)/pkg
+RTLLIB_DIR = ../utils/rtl
 SCRIPT_DIR = scripts
 SRC_DIR = src
 SRC_HDL_DIR = $(SRC_DIR)/hdl
@@ -63,6 +64,7 @@ clean:
 	rm -rf ./$(BUILD_DIR) ./_x ./$(LOG_DIR)
 	rm -f ./hs_err_pid* ./v++_* ./xcd.log ./xrc.log
 	rm -f ./profile_kernels.csv ./timeline_kernels.csv ./$(PLATFORM)-0-$(KERNEL)*
+	rm -rf ./.ipcache/ ./.Xil/
 
 build: check_parameters $(PACKAGED_KERNEL) $(OBJECTS) $(EMCONFIG)
 
@@ -83,18 +85,18 @@ endif
 elaborate: check_parameters
 	mkdir -p $(VIVADO_ELABORATE_DIR)
 	mkdir -p $(LOG_DIR)
-	$(VIVADO) -mode batch $(VIVADO_LOG) -source $(TCL_SYNTH) -tclargs $(SRC_HDL_DIR) $(KERNEL) $(VIVADO_ELABORATE_DIR) -rtl
+	$(VIVADO) -mode batch $(VIVADO_LOG) -source $(TCL_SYNTH) -tclargs $(SRC_HDL_DIR) $(KERNEL) $(VIVADO_ELABORATE_DIR) $(RTLLIB_DIR) -rtl
 
 synth: check_parameters
 	mkdir -p $(VIVADO_SYNTH_DIR)
 	mkdir -p $(LOG_DIR)
-	$(VIVADO) -mode batch $(VIVADO_LOG) -source $(TCL_SYNTH) -tclargs $(SRC_HDL_DIR) $(KERNEL) $(VIVADO_SYNTH_DIR)
+	$(VIVADO) -mode batch $(VIVADO_LOG) -source $(TCL_SYNTH) -tclargs $(SRC_HDL_DIR) $(KERNEL) $(VIVADO_SYNTH_DIR) $(RTLLIB_DIR)
 
 $(PACKAGED_KERNEL): $(TCL_PACKAGE) $(VERILOG_FILES) $(SYSTEM_VERILOG_FILES)
 	mkdir -p $(VIVADO_PACKAGE_DIR)
 	mkdir -p $(OBJECTS_DIR)
 	mkdir -p $(LOG_DIR)
-	$(VIVADO) -mode batch $(VIVADO_LOG) -source $(TCL_PACKAGE) -tclargs $(PACKAGED_KERNEL) $(KERNEL) $(VIVADO_PACKAGE_DIR) $(SRC_HDL_DIR)
+	$(VIVADO) -mode batch $(VIVADO_LOG) -source $(TCL_PACKAGE) -tclargs $(PACKAGED_KERNEL) $(KERNEL) $(VIVADO_PACKAGE_DIR) $(SRC_HDL_DIR) $(RTLLIB_DIR)
 
 $(DEVICE_BINARY): $(PACKAGED_KERNEL)
 	mkdir -p $(VITIS_BUILD_DIR)

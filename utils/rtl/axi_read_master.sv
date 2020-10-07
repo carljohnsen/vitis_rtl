@@ -49,7 +49,7 @@
 // default_nettype of none prevents implicit wire declaration.
 `default_nettype none
 
-module byteswap_axi_read_master #(
+module axi_read_master #(
   // Set to the address width of the interface
   parameter integer C_M_AXI_ADDR_WIDTH  = 64,
 
@@ -83,7 +83,7 @@ module byteswap_axi_read_master #(
 
   // The following ctrl signals are sampled when ctrl_start is asserted
   input  wire [C_M_AXI_ADDR_WIDTH-1:0] ctrl_addr_offset,        // Starting Address offset
-  input  wire [C_XFER_SIZE_WIDTH-1:0]  ctrl_xfer_size_in_bytes, // Length in number of bytes, limited by the address width.
+  input  wire [C_XFER_SIZE_WIDTH-1:0]  ctrl_xfer_bytes, // Length in number of bytes, limited by the address width.
 
   // AXI4 master interface (read only)
   output wire                          m_axi_arvalid,
@@ -190,9 +190,9 @@ end
 always @(posedge aclk) begin
   if (ctrl_start) begin
     // Round transfer size up to integer value of the axi interface data width. Convert to axi_arlen format which is length -1.
-    total_len_r <= ctrl_xfer_size_in_bytes[0+:LP_LOG_DW_BYTES] > 0
-                      ? ctrl_xfer_size_in_bytes[LP_LOG_DW_BYTES+:LP_TOTAL_LEN_WIDTH]
-                      : ctrl_xfer_size_in_bytes[LP_LOG_DW_BYTES+:LP_TOTAL_LEN_WIDTH] - 1'b1;
+    total_len_r <= ctrl_xfer_bytes[0+:LP_LOG_DW_BYTES] > 0
+                      ? ctrl_xfer_bytes[LP_LOG_DW_BYTES+:LP_TOTAL_LEN_WIDTH]
+                      : ctrl_xfer_bytes[LP_LOG_DW_BYTES+:LP_TOTAL_LEN_WIDTH] - 1'b1;
     // Align transfer to 4kB to avoid AXI protocol issues if starting address is not correctly aligned.
     addr_offset_r <= ctrl_addr_offset & ~LP_ADDR_MASK;
   end
@@ -249,7 +249,7 @@ always @(posedge aclk) begin
 end
 
 // Counts down the number of transactions to send.
-byteswap_counter #(
+axi_counter #(
   .C_WIDTH ( LP_TRANSACTION_CNTR_WIDTH         ) ,
   .C_INIT  ( {LP_TRANSACTION_CNTR_WIDTH{1'b0}} )
 )
@@ -271,7 +271,7 @@ assign ar_done = ar_final_transaction && arxfer;
 // Keeps track of the number of outstanding transactions. Stalls
 // when the value is reached so that the FIFO won't overflow.
 // If no FIFO present, then just limit at max outstanding transactions.
-byteswap_counter #(
+axi_counter #(
   .C_WIDTH ( LP_OUTSTANDING_CNTR_WIDTH                       ) ,
   .C_INIT  ( C_MAX_OUTSTANDING[0+:LP_OUTSTANDING_CNTR_WIDTH] )
 )
@@ -362,7 +362,7 @@ always_comb begin
   decr_r_transaction_cntr = rxfer & m_axi_rlast;
 end
 
-byteswap_counter #(
+axi_counter #(
   .C_WIDTH ( LP_TRANSACTION_CNTR_WIDTH         ) ,
   .C_INIT  ( {LP_TRANSACTION_CNTR_WIDTH{1'b0}} )
 )
@@ -378,7 +378,7 @@ inst_r_transaction_cntr (
   .is_zero    ( r_final_transaction           )
 );
 
-endmodule : byteswap_axi_read_master
+endmodule : axi_read_master
 
 `default_nettype wire
 

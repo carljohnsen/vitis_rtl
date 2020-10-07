@@ -39,7 +39,7 @@
 // default_nettype of none prevents implicit wire declaration.
 `default_nettype none
 
-module byteswap_axi_write_master #(
+module axi_write_master #(
   // Set to the address width of the interface
   parameter integer C_M_AXI_ADDR_WIDTH  = 64,
 
@@ -68,7 +68,7 @@ module byteswap_axi_write_master #(
   output wire                            ctrl_done,               // Pulses high for one cycle when transfer request is complete
   // The following ctrl signals are sampled when ctrl_start is asserted
   input  wire [C_M_AXI_ADDR_WIDTH-1:0]   ctrl_addr_offset,        // Starting Address offset
-  input  wire [C_XFER_SIZE_WIDTH-1:0]    ctrl_xfer_size_in_bytes, // Length in number of bytes, limited by the address width.
+  input  wire [C_XFER_SIZE_WIDTH-1:0]    ctrl_xfer_bytes, // Length in number of bytes, limited by the address width.
 
   // AXI4 master interface (write only)
   output wire                            m_axi_awvalid,
@@ -186,12 +186,12 @@ end
 always @(posedge aclk) begin
   if (ctrl_start) begin
     // Round transfer size up to integer value of the axi interface data width. Convert to axi_arlen format which is length -1.
-    total_len_r <= ctrl_xfer_size_in_bytes[0+:LP_LOG_DW_BYTES] > 0
-                      ? ctrl_xfer_size_in_bytes[LP_LOG_DW_BYTES+:LP_TOTAL_LEN_WIDTH]
-                      : ctrl_xfer_size_in_bytes[LP_LOG_DW_BYTES+:LP_TOTAL_LEN_WIDTH] - 1'b1;
+    total_len_r <= ctrl_xfer_bytes[0+:LP_LOG_DW_BYTES] > 0
+                      ? ctrl_xfer_bytes[LP_LOG_DW_BYTES+:LP_TOTAL_LEN_WIDTH]
+                      : ctrl_xfer_bytes[LP_LOG_DW_BYTES+:LP_TOTAL_LEN_WIDTH] - 1'b1;
     // Align transfer to burst length to avoid AXI protocol issues if starting address is not correctly aligned.
     addr_offset_r <= ctrl_addr_offset & ~LP_ADDR_MASK;
-    byte_remainder_r <= ctrl_xfer_size_in_bytes[0+:LP_LOG_DW_BYTES]-1'b1;
+    byte_remainder_r <= ctrl_xfer_bytes[0+:LP_LOG_DW_BYTES]-1'b1;
   end
 end
 
@@ -310,7 +310,7 @@ end
 // Load burst counter with partial burst if on final transaction or if there is only 1 transaction
 assign load_burst_cntr = (wxfer & m_axi_wlast & w_almost_final_transaction) || (start & single_transaction);
 
-byteswap_counter #(
+axi_counter #(
   .C_WIDTH ( LP_LOG_BURST_LEN         ) ,
   .C_INIT  ( {LP_LOG_BURST_LEN{1'b1}} )
 )
@@ -326,7 +326,7 @@ inst_burst_cntr (
   .is_zero    ( m_axi_wlast     )
 );
 
-byteswap_counter #(
+axi_counter #(
   .C_WIDTH ( LP_TRANSACTION_CNTR_WIDTH         ) ,
   .C_INIT  ( {LP_TRANSACTION_CNTR_WIDTH{1'b0}} )
 )
@@ -377,7 +377,7 @@ end
 
 assign m_axi_awlen   = aw_final_transaction || (start & single_transaction) ? final_burst_len : LP_AXI_BURST_LEN- 1;
 
-byteswap_counter #(
+axi_counter #(
   .C_WIDTH (LP_LOG_MAX_W_TO_AW),
   .C_INIT ({LP_LOG_MAX_W_TO_AW{1'b0}})
 )
@@ -401,7 +401,7 @@ always @(posedge aclk) begin
   wfirst_pulse <= m_axi_wvalid & wfirst & ~wfirst_d1;
 end
 
-byteswap_counter #(
+axi_counter #(
   .C_WIDTH ( LP_TRANSACTION_CNTR_WIDTH         ) ,
   .C_INIT  ( {LP_TRANSACTION_CNTR_WIDTH{1'b0}} )
 )
@@ -423,7 +423,7 @@ inst_aw_transaction_cntr (
 assign m_axi_bready = 1'b1;
 assign bxfer = m_axi_bready & m_axi_bvalid;
 
-byteswap_counter #(
+axi_counter #(
   .C_WIDTH ( LP_TRANSACTION_CNTR_WIDTH         ) ,
   .C_INIT  ( {LP_TRANSACTION_CNTR_WIDTH{1'b0}} )
 )
@@ -442,7 +442,7 @@ inst_b_transaction_cntr (
 // Keeps track of the number of outstanding transactions. Stalls
 // when the value is reached so that the FIFO won't overflow.
 // If no FIFO present, then just limit at max outstanding transactions.
-byteswap_counter #(
+axi_counter #(
   .C_WIDTH ( LP_OUTSTANDING_CNTR_WIDTH                       ) ,
   .C_INIT  ( C_MAX_OUTSTANDING[0+:LP_OUTSTANDING_CNTR_WIDTH] )
 )
@@ -458,7 +458,7 @@ inst_aw_to_b_transaction_cntr (
   .is_zero    ( stall_aw                          )
 );
 
-endmodule : byteswap_axi_write_master
+endmodule : axi_write_master
 
 `default_nettype wire
 
