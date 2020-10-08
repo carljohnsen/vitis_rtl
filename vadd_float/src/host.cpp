@@ -1,8 +1,10 @@
 #include <vector>
 #include <iostream>
+#include <stdlib.h>
+#include <time.h>
 #include "hlslib/xilinx/SDAccel.h"
 
-#define DATA_SIZE 256
+#define DATA_SIZE 4096
 
 int main(int argc, char **argv) {
     // Check the arguments and load them
@@ -13,11 +15,12 @@ int main(int argc, char **argv) {
     std::string binary_file = argv[1];
 
     // Allocate host memory and input data
+    srand(time(NULL));
     const auto size = DATA_SIZE;
     std::vector<float> input_data(size), expected_result(size), result(size);
     for (int i = 0; i < size; i++) {
         // Input data
-        input_data[i] = (float)i;
+        input_data[i] = (static_cast<float>(rand()) / (static_cast<float>(RAND_MAX))) * 1000.;
 
         // Compute the results
         expected_result[i] = input_data[i] + input_data[i];
