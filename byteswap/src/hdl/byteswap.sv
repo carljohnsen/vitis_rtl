@@ -62,7 +62,6 @@ logic                         ap_idle_r = 1'b1;
 logic                         ap_start_pulse;
 logic [LP_NUM_EXAMPLES-1:0]   ap_done_i;
 logic [LP_NUM_EXAMPLES-1:0]   ap_done_r = {LP_NUM_EXAMPLES{1'b0}};
-logic [C_XFER_SIZE_WIDTH-1:0] ctrl_xfer_bytes = scalar00;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Begin Controller logic
@@ -135,7 +134,7 @@ inst_axi_read_master (
   .ctrl_start       ( ap_start_pulse ),
   .ctrl_done        ( read_done ),
   .ctrl_addr_offset ( axi00_ptr0 ),
-  .ctrl_xfer_bytes  ( ctrl_xfer_bytes ),
+  .ctrl_xfer_bytes  ( scalar00 ),
   .m_axi_arvalid    ( m00_axi_arvalid ),
   .m_axi_arready    ( m00_axi_arready ),
   .m_axi_araddr     ( m00_axi_araddr ),
@@ -200,7 +199,7 @@ inst_axi_write_master (
   .ctrl_start       ( ap_start_pulse ),
   .ctrl_done        ( write_done ),
   .ctrl_addr_offset ( axi00_ptr0 ),
-  .ctrl_xfer_bytes  ( ctrl_xfer_bytes ),
+  .ctrl_xfer_bytes  ( scalar00 ),
   .m_axi_awvalid    ( m00_axi_awvalid ),
   .m_axi_awready    ( m00_axi_awready ),
   .m_axi_awaddr     ( m00_axi_awaddr ),

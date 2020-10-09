@@ -1,8 +1,11 @@
 #include <vector>
 #include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 #include "hlslib/xilinx/SDAccel.h"
 
-#define DATA_SIZE 256
+#define DATA_SIZE 16384 * 16
 
 int main(int argc, char **argv) {
     // Check the arguments and load them
@@ -13,11 +16,13 @@ int main(int argc, char **argv) {
     std::string binary_file = argv[1];
 
     // Allocate host memory and input data
-    const auto size = DATA_SIZE;
+    srand(time(NULL));
+    const int size = DATA_SIZE;
+    const int size_bytes = size * sizeof(int);
     std::vector<int> input_data(size), expected_result(size), result(size);
     for (int i = 0; i < size; i++) {
         // Input data
-        input_data[i] = i;
+        input_data[i] = rand();
 
         // Compute the results
         expected_result[i] = 0;
@@ -40,7 +45,7 @@ int main(int argc, char **argv) {
     gmem.CopyFromHost(input_data.begin());
 
     // Create the kernel
-    auto kernel = program.MakeKernel("byteswap_top", size*4, gmem);
+    auto kernel = program.MakeKernel("byteswap_top", size_bytes, gmem);
 
     // Execute kernel
     const auto elapsed = kernel.ExecuteTask();
@@ -52,9 +57,8 @@ int main(int argc, char **argv) {
     int match = 0;
     for (int i = 0; i < size; i++) {
         if (expected_result[i] != result[i]) {
-            std::cout << "Error: Result mismatch" << std::endl;
-            std::cout << "i = " << i << " Software result = " << expected_result[i]
-                      << " Device result = " << result[i] << std::endl;
+            printf("Error %d: result %08x != expected %08x\n",
+                    i, result[i], expected_result[i]);
             match = 1;
         }
     }
