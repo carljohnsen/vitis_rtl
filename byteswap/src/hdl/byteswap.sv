@@ -17,8 +17,8 @@ module byteswap #(
     output wire                            ap_idle,
     output wire                            ap_done,
     output wire                            ap_ready,
-    input  wire [C_XFER_SIZE_WIDTH-1:0]    scalar00,
-    input  wire [C_M00_AXI_ADDR_WIDTH-1:0] axi00_ptr0,
+    input  wire [C_XFER_SIZE_WIDTH-1:0]    xfer_size_bytes,
+    input  wire [C_M00_AXI_ADDR_WIDTH-1:0] gmem_ptr,
 
     // AXI4 master interface m00_axi
     output wire                              m00_axi_awvalid,
@@ -48,7 +48,8 @@ timeprecision 1ps;
 // Local Parameters
 localparam integer LP_NUM_EXAMPLES       = 1;
 localparam integer LP_DW_BYTES           = C_M00_AXI_DATA_WIDTH/8;
-localparam integer LP_AXI_BURST_LEN      = 4096/LP_DW_BYTES < 256 ? 4096/LP_DW_BYTES : 256;
+localparam integer LP_AXI_BURST_LEN      =
+    4096/LP_DW_BYTES < 256 ? 4096/LP_DW_BYTES : 256;
 localparam integer LP_LOG_BURST_LEN      = $clog2(LP_AXI_BURST_LEN);
 localparam integer LP_BRAM_DEPTH         = 512;
 localparam integer LP_RD_MAX_OUTSTANDING = LP_BRAM_DEPTH / LP_AXI_BURST_LEN;
@@ -133,8 +134,8 @@ inst_axi_read_master (
   .areset           ( areset ),
   .ctrl_start       ( ap_start_pulse ),
   .ctrl_done        ( read_done ),
-  .ctrl_addr_offset ( axi00_ptr0 ),
-  .ctrl_xfer_bytes  ( scalar00 ),
+  .ctrl_addr_offset ( gmem_ptr ),
+  .ctrl_xfer_bytes  ( xfer_size_bytes ),
   .m_axi_arvalid    ( m00_axi_arvalid ),
   .m_axi_arready    ( m00_axi_arready ),
   .m_axi_araddr     ( m00_axi_araddr ),
@@ -198,8 +199,8 @@ inst_axi_write_master (
   .areset           ( areset ),
   .ctrl_start       ( ap_start_pulse ),
   .ctrl_done        ( write_done ),
-  .ctrl_addr_offset ( axi00_ptr0 ),
-  .ctrl_xfer_bytes  ( scalar00 ),
+  .ctrl_addr_offset ( gmem_ptr ),
+  .ctrl_xfer_bytes  ( xfer_size_bytes ),
   .m_axi_awvalid    ( m00_axi_awvalid ),
   .m_axi_awready    ( m00_axi_awready ),
   .m_axi_awaddr     ( m00_axi_awaddr ),

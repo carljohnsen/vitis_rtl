@@ -2,7 +2,6 @@
 `timescale 1ps / 1ps
 
 module byteswap_swapper #(
-    parameter integer C_NUM_CLOCKS = 1,
     parameter integer C_AXIS_TDATA_WIDTH = 512,
     parameter integer C_WORD_BIT_WIDTH   = 32,
     parameter integer C_BYTE_BIT_WIDTH   = 8
@@ -21,13 +20,14 @@ module byteswap_swapper #(
     input  wire                            m_axis_tready,
     output wire [C_AXIS_TDATA_WIDTH-1:0]   m_axis_tdata,
     output wire [C_AXIS_TDATA_WIDTH/8-1:0] m_axis_tkeep,
-    output wire                            m_axis_tlast,
-    input wire [31:0] ctrl_constant
+    output wire                            m_axis_tlast
 );
 
 // Local parameters
-localparam integer LP_NUM_LOOPS = C_AXIS_TDATA_WIDTH/C_WORD_BIT_WIDTH;
+localparam integer LP_NUM_LOOPS = C_AXIS_TDATA_WIDTH / C_WORD_BIT_WIDTH;
 localparam integer LP_NUM_BYTES = C_WORD_BIT_WIDTH / C_BYTE_BIT_WIDTH;
+localparam integer LP_BYTE = C_BYTE_BIT_WIDTH;
+localparam integer LP_WORD = C_WORD_BIT_WIDTH;
 
 /////////////////////////////////////////////////////////////////////////////
 // Variables
@@ -67,8 +67,8 @@ always @(posedge s_axis_aclk) begin
     if (d2_tready) begin
         for (i = 0; i < LP_NUM_LOOPS; i = i + 1) begin
             for (j = 0; j < LP_NUM_BYTES;  j = j + 1) begin
-                d2_tdata[(i*C_WORD_BIT_WIDTH)+(j*C_BYTE_BIT_WIDTH)+:C_BYTE_BIT_WIDTH] <=
-                    d1_tdata[(C_WORD_BIT_WIDTH*(i+1))-((j+1)*C_BYTE_BIT_WIDTH)+:C_BYTE_BIT_WIDTH];
+                d2_tdata[(i*LP_WORD)+(j*LP_BYTE)+:LP_BYTE] <=
+                    d1_tdata[((i+1)*LP_WORD)-((j+1)*LP_BYTE)+:LP_BYTE];
             end
         end
     end

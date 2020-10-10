@@ -5,6 +5,7 @@
 #include <time.h>
 #include "hlslib/xilinx/SDAccel.h"
 
+// 1 MB
 #define DATA_SIZE 16384 * 16
 
 int main(int argc, char **argv) {
@@ -22,7 +23,7 @@ int main(int argc, char **argv) {
     std::vector<int> input_data(size), expected_result(size), result(size);
     for (int i = 0; i < size; i++) {
         // Input data
-        input_data[i] = rand();
+        input_data[i] = i;//rand();
 
         // Compute the results
         expected_result[i] = 0;
@@ -60,6 +61,7 @@ int main(int argc, char **argv) {
             printf("Error %d: result %08x != expected %08x\n",
                     i, result[i], expected_result[i]);
             match = 1;
+            break;
         }
     }
 
