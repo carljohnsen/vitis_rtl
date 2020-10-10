@@ -110,12 +110,12 @@ set reg [::ipx::add_register "IP_ISR" $addr_block]
     set_property size           32                                        $reg
 
 # Set the IP registers of the core
-set reg [::ipx::add_register -quiet "scalar00" $addr_block]
-    set_property description    "Kernel parameter scalar00"               $reg
+set reg [::ipx::add_register -quiet "xfer_size_bytes" $addr_block]
+    set_property description    "Kernel parameter xfer_size_bytes"        $reg
     set_property address_offset 0x010                                     $reg
     set_property size           [expr {4*8}]                              $reg
-set reg [::ipx::add_register -quiet "a" $addr_block]
-    set_property description    "Kernel parameter axi00"                  $reg
+set reg [::ipx::add_register -quiet "gmem_ptr" $addr_block]
+    set_property description    "Kernel parameter gmem_ptr"               $reg
     set_property address_offset 0x018                                     $reg
     set_property size           [expr {8*8}]                              $reg
     set regparam [::ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg]

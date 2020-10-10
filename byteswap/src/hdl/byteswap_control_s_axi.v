@@ -1,5 +1,6 @@
 // ==============================================================
-// Vivado(TM) HLS - High-Level Synthesis from C, C++ and SystemC v2020.1 (64-bit)
+// Vivado(TM) HLS
+// High-Level Synthesis from C, C++ and SystemC v2020.1 (64-bit)
 // Copyright 1986-2020 Xilinx, Inc. All Rights Reserved.
 // ==============================================================
 `timescale 1ns/1ps
@@ -8,33 +9,33 @@ module byteswap_control_s_axi
     C_S_AXI_ADDR_WIDTH = 6,
     C_S_AXI_DATA_WIDTH = 32
 )(
-    input  wire                          ACLK,
-    input  wire                          ARESET,
-    input  wire                          ACLK_EN,
-    input  wire [C_S_AXI_ADDR_WIDTH-1:0] AWADDR,
-    input  wire                          AWVALID,
-    output wire                          AWREADY,
-    input  wire [C_S_AXI_DATA_WIDTH-1:0] WDATA,
+    input  wire                            ACLK,
+    input  wire                            ARESET,
+    input  wire                            ACLK_EN,
+    input  wire [C_S_AXI_ADDR_WIDTH-1:0]   AWADDR,
+    input  wire                            AWVALID,
+    output wire                            AWREADY,
+    input  wire [C_S_AXI_DATA_WIDTH-1:0]   WDATA,
     input  wire [C_S_AXI_DATA_WIDTH/8-1:0] WSTRB,
-    input  wire                          WVALID,
-    output wire                          WREADY,
-    output wire [1:0]                    BRESP,
-    output wire                          BVALID,
-    input  wire                          BREADY,
-    input  wire [C_S_AXI_ADDR_WIDTH-1:0] ARADDR,
-    input  wire                          ARVALID,
-    output wire                          ARREADY,
-    output wire [C_S_AXI_DATA_WIDTH-1:0] RDATA,
-    output wire [1:0]                    RRESP,
-    output wire                          RVALID,
-    input  wire                          RREADY,
-    output wire                          interrupt,
-    output wire                          ap_start,
-    input  wire                          ap_done,
-    input  wire                          ap_ready,
-    input  wire                          ap_idle,
-    output wire [31:0]                   scalar00,
-    output wire [63:0]                   axi00_ptr0
+    input  wire                            WVALID,
+    output wire                            WREADY,
+    output wire [1:0]                      BRESP,
+    output wire                            BVALID,
+    input  wire                            BREADY,
+    input  wire [C_S_AXI_ADDR_WIDTH-1:0]   ARADDR,
+    input  wire                            ARVALID,
+    output wire                            ARREADY,
+    output wire [C_S_AXI_DATA_WIDTH-1:0]   RDATA,
+    output wire [1:0]                      RRESP,
+    output wire                            RVALID,
+    input  wire                            RREADY,
+    output wire                            interrupt,
+    output wire                            ap_start,
+    input  wire                            ap_done,
+    input  wire                            ap_ready,
+    input  wire                            ap_idle,
+    output wire [31:0]                     xfer_size_bytes,
+    output wire [63:0]                     gmem_ptr
 );
 //------------------------Address Info-------------------
 // 0x00 : Control signals
@@ -55,35 +56,36 @@ module byteswap_control_s_axi
 //        bit 0  - Channel 0 (ap_done)
 //        bit 1  - Channel 1 (ap_ready)
 //        others - reserved
-// 0x10 : Data signal of scalar00
-//        bit 31~0 - scalar00[31:0] (Read/Write)
+// 0x10 : Data signal of xfer_size_bytes
+//        bit 31~0 - xfer_size_bytes[31:0] (Read/Write)
 // 0x14 : reserved
-// 0x18 : Data signal of axi00_ptr0
-//        bit 31~0 - axi00_ptr0[31:0] (Read/Write)
-// 0x1c : Data signal of axi00_ptr0
-//        bit 31~0 - axi00_ptr0[63:32] (Read/Write)
+// 0x18 : Data signal of gmem_ptr
+//        bit 31~0 - gmem_ptr[31:0] (Read/Write)
+// 0x1c : Data signal of gmem_ptr
+//        bit 31~0 - gmem_ptr[63:32] (Read/Write)
 // 0x20 : reserved
-// (SC = Self Clear, COR = Clear on Read, TOW = Toggle on Write, COH = Clear on Handshake)
+// (SC = Self Clear, COR = Clear on Read,
+//  TOW = Toggle on Write, COH = Clear on Handshake)
 
 //------------------------Parameter----------------------
 localparam
-    ADDR_AP_CTRL           = 6'h00,
-    ADDR_GIE               = 6'h04,
-    ADDR_IER               = 6'h08,
-    ADDR_ISR               = 6'h0c,
-    ADDR_SCALAR00_DATA_0   = 6'h10,
-    ADDR_SCALAR00_CTRL     = 6'h14,
-    ADDR_AXI00_PTR0_DATA_0 = 6'h18,
-    ADDR_AXI00_PTR0_DATA_1 = 6'h1c,
-    ADDR_AXI00_PTR0_CTRL   = 6'h20,
-    WRIDLE                 = 2'd0,
-    WRDATA                 = 2'd1,
-    WRRESP                 = 2'd2,
-    WRRESET                = 2'd3,
-    RDIDLE                 = 2'd0,
-    RDDATA                 = 2'd1,
-    RDRESET                = 2'd2,
-    ADDR_BITS         = 6;
+    ADDR_AP_CTRL                 = 6'h00,
+    ADDR_GIE                     = 6'h04,
+    ADDR_IER                     = 6'h08,
+    ADDR_ISR                     = 6'h0c,
+    ADDR_XFER_SIZE_BYTES_DATA_0  = 6'h10,
+    ADDR_XFER_SIZE_BYTES_CTRL    = 6'h14,
+    ADDR_GMEM_PTR_DATA_0         = 6'h18,
+    ADDR_GMEM_PTR_DATA_1         = 6'h1c,
+    ADDR_GMEM_PTR_CTRL           = 6'h20,
+    WRIDLE                       = 2'd0,
+    WRDATA                       = 2'd1,
+    WRRESP                       = 2'd2,
+    WRRESET                      = 2'd3,
+    RDIDLE                       = 2'd0,
+    RDDATA                       = 2'd1,
+    RDRESET                      = 2'd2,
+    ADDR_BITS                    = 6;
 
 //------------------------Local signal-------------------
     reg  [1:0]                    wstate = WRRESET;
@@ -106,8 +108,8 @@ localparam
     reg                           int_gie = 1'b0;
     reg  [1:0]                    int_ier = 2'b0;
     reg  [1:0]                    int_isr = 2'b0;
-    reg  [31:0]                   int_scalar00 = 'b0;
-    reg  [63:0]                   int_axi00_ptr0 = 'b0;
+    reg  [31:0]                   int_xfer_size_bytes = 'b0;
+    reg  [63:0]                   int_gmem_ptr = 'b0;
 
 //------------------------Instantiation------------------
 
@@ -215,14 +217,14 @@ always @(posedge ACLK) begin
                 ADDR_ISR: begin
                     rdata <= int_isr;
                 end
-                ADDR_SCALAR00_DATA_0: begin
-                    rdata <= int_scalar00[31:0];
+                ADDR_XFER_SIZE_BYTES_DATA_0: begin
+                    rdata <= int_xfer_size_bytes[31:0];
                 end
-                ADDR_AXI00_PTR0_DATA_0: begin
-                    rdata <= int_axi00_ptr0[31:0];
+                ADDR_GMEM_PTR_DATA_0: begin
+                    rdata <= int_gmem_ptr[31:0];
                 end
-                ADDR_AXI00_PTR0_DATA_1: begin
-                    rdata <= int_axi00_ptr0[63:32];
+                ADDR_GMEM_PTR_DATA_1: begin
+                    rdata <= int_gmem_ptr[63:32];
                 end
             endcase
         end
@@ -233,8 +235,8 @@ end
 //------------------------Register logic-----------------
 assign interrupt  = int_gie & (|int_isr);
 assign ap_start   = int_ap_start;
-assign scalar00   = int_scalar00;
-assign axi00_ptr0 = int_axi00_ptr0;
+assign xfer_size_bytes   = int_xfer_size_bytes;
+assign gmem_ptr = int_gmem_ptr;
 // int_ap_start
 always @(posedge ACLK) begin
     if (ARESET)
@@ -331,33 +333,36 @@ always @(posedge ACLK) begin
     end
 end
 
-// int_scalar00[31:0]
+// int_xfer_size_bytes[31:0]
 always @(posedge ACLK) begin
     if (ARESET)
-        int_scalar00[31:0] <= 0;
+        int_xfer_size_bytes[31:0] <= 0;
     else if (ACLK_EN) begin
-        if (w_hs && waddr == ADDR_SCALAR00_DATA_0)
-            int_scalar00[31:0] <= (WDATA[31:0] & wmask) | (int_scalar00[31:0] & ~wmask);
+        if (w_hs && waddr == ADDR_XFER_SIZE_BYTES_DATA_0)
+            int_xfer_size_bytes[31:0] <=
+                (WDATA[31:0] & wmask) | (int_xfer_size_bytes[31:0] & ~wmask);
     end
 end
 
-// int_axi00_ptr0[31:0]
+// int_gmem_ptr[31:0]
 always @(posedge ACLK) begin
     if (ARESET)
-        int_axi00_ptr0[31:0] <= 0;
+        int_gmem_ptr[31:0] <= 0;
     else if (ACLK_EN) begin
-        if (w_hs && waddr == ADDR_AXI00_PTR0_DATA_0)
-            int_axi00_ptr0[31:0] <= (WDATA[31:0] & wmask) | (int_axi00_ptr0[31:0] & ~wmask);
+        if (w_hs && waddr == ADDR_GMEM_PTR_DATA_0)
+            int_gmem_ptr[31:0] <=
+                (WDATA[31:0] & wmask) | (int_gmem_ptr[31:0] & ~wmask);
     end
 end
 
-// int_axi00_ptr0[63:32]
+// int_gmem_ptr[63:32]
 always @(posedge ACLK) begin
     if (ARESET)
-        int_axi00_ptr0[63:32] <= 0;
+        int_gmem_ptr[63:32] <= 0;
     else if (ACLK_EN) begin
-        if (w_hs && waddr == ADDR_AXI00_PTR0_DATA_1)
-            int_axi00_ptr0[63:32] <= (WDATA[31:0] & wmask) | (int_axi00_ptr0[63:32] & ~wmask);
+        if (w_hs && waddr == ADDR_GMEM_PTR_DATA_1)
+            int_gmem_ptr[63:32] <=
+                (WDATA[31:0] & wmask) | (int_gmem_ptr[63:32] & ~wmask);
     end
 end
 
