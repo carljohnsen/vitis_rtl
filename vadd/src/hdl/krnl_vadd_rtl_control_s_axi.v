@@ -1,32 +1,32 @@
 // /*******************************************************************************
 // Copyright (c) 2018, Xilinx, Inc.
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
-// 
+//
 // 1. Redistributions of source code must retain the above copyright notice,
 // this list of conditions and the following disclaimer.
-// 
-// 
+//
+//
 // 2. Redistributions in binary form must reproduce the above copyright notice,
 // this list of conditions and the following disclaimer in the documentation
 // and/or other materials provided with the distribution.
-// 
-// 
+//
+//
 // 3. Neither the name of the copyright holder nor the names of its contributors
 // may be used to endorse or promote products derived from this software
 // without specific prior written permission.
-// 
-// 
+//
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-// ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,THE IMPLIED 
+// ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-// IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, 
-// INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
-// BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
-// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
-// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
+// IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+// INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+// BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
@@ -131,33 +131,33 @@ localparam
     WRRESP               = 2'd2,
     RDIDLE               = 2'd0,
     RDDATA               = 2'd1,
-    ADDR_BITS         = 6;
+    ADDR_BITS            = 6;
 
 //------------------------Local signal-------------------
-    reg  [1:0]                    wstate = WRIDLE;
-    reg  [1:0]                    wnext;
-    reg  [ADDR_BITS-1:0]          waddr;
-    wire [31:0]                   wmask;
-    wire                          aw_hs;
-    wire                          w_hs;
-    reg  [1:0]                    rstate = RDIDLE;
-    reg  [1:0]                    rnext;
-    reg  [31:0]                   rdata;
-    wire                          ar_hs;
-    wire [ADDR_BITS-1:0]          raddr;
+    reg  [1:0]           wstate = WRIDLE;
+    reg  [1:0]           wnext;
+    reg  [ADDR_BITS-1:0] waddr;
+    wire [31:0]          wmask;
+    wire                 aw_hs;
+    wire                 w_hs;
+    reg  [1:0]           rstate = RDIDLE;
+    reg  [1:0]           rnext;
+    reg  [31:0]          rdata;
+    wire                 ar_hs;
+    wire [ADDR_BITS-1:0] raddr;
     // internal registers
-    wire                          int_ap_idle;
-    wire                          int_ap_ready;
-    reg                           int_ap_done = 1'b0;
-    reg                           int_ap_start = 1'b0;
-    reg                           int_auto_restart = 1'b0;
-    reg                           int_gie = 2'b0;
-    reg  [1:0]                    int_ier = 2'b0;
-    reg  [1:0]                    int_isr = 2'b0;
-    reg  [63:0]                   int_a = 64'b0;
-    reg  [63:0]                   int_b = 64'b0;
-    reg  [63:0]                   int_c = 64'b0;
-    reg  [31:0]                   int_length_r = 32'b0;
+    wire                 int_ap_idle;
+    wire                 int_ap_ready;
+    reg                  int_ap_done = 1'b0;
+    reg                  int_ap_start = 1'b0;
+    reg                  int_auto_restart = 1'b0;
+    reg                  int_gie = 2'b0;
+    reg  [1:0]           int_ier = 2'b0;
+    reg  [1:0]           int_isr = 2'b0;
+    reg  [63:0]          int_a = 64'b0;
+    reg  [63:0]          int_b = 64'b0;
+    reg  [63:0]          int_c = 64'b0;
+    reg  [31:0]          int_length_r = 32'b0;
 
 //------------------------Instantiation------------------
 
@@ -291,7 +291,6 @@ always @(posedge ACLK) begin
     end
 end
 
-
 //------------------------Register logic-----------------
 assign interrupt    = int_gie & (|int_isr);
 assign ap_start     = int_ap_start;
@@ -301,6 +300,7 @@ assign a            = int_a;
 assign b            = int_b;
 assign c            = int_c;
 assign length_r     = int_length_r;
+
 // int_ap_start
 always @(posedge ACLK) begin
     if (ARESET)
@@ -448,7 +448,6 @@ always @(posedge ACLK) begin
             int_length_r[31:0] <= (WDATA[31:0] & wmask) | (int_length_r[31:0] & ~wmask);
     end
 end
-
 
 //------------------------Memory logic-------------------
 

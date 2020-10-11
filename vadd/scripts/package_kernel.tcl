@@ -1,16 +1,17 @@
 #
 # Argument parsing
 #
-if { $::argc != 4 } {
-    puts "Error: Program \"$::argv0\" requires 4 arguments.\n"
-    puts "Usage: $::argv0 <xoname> <kernel_name> <build_dir> <rtl_src_dir>\n"
+if { $::argc != 5 } {
+    puts "Error: Program \"$::argv0\" requires 5 arguments.\n"
+    puts "Usage: $::argv0 <xoname> <kernel_name> <build_dir> <rtl_src_dir> <include_dir>\n"
     exit
 }
-
+# TODO muligvis have memory bus navn?
 set xoname      [lindex $::argv 0]
 set kernel_name [lindex $::argv 1]
 set build_dir   [lindex $::argv 2]
 set src_dir     [lindex $::argv 3]
+set include_dir [lindex $::argv 4]
 
 set tmp_dir "$build_dir/tmp"
 set pkg_dir "$build_dir/pkg"
@@ -19,9 +20,11 @@ set pkg_dir "$build_dir/pkg"
 # Build the kernel
 #
 create_project kernel_packing $tmp_dir
-add_files [glob $src_dir/*.v $src_dir/*.sv]
+add_files [glob $src_dir/*.v $src_dir/*.sv $include_dir/*.v $include_dir/*.sv]
 update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1
+set_property top $kernel_name [current_fileset]
+set_property top_file {$src_dir/$kernel_name} [current_fileset]
 ipx::package_project -root_dir $pkg_dir -vendor xilinx.com -library RTLKernel -taxonomy /KernelIP -import_files -set_current false
 ipx::unload_core $pkg_dir/component.xml
 ipx::edit_ip_in_project -upgrade true -name tmp_project -directory $pkg_dir $pkg_dir/component.xml
