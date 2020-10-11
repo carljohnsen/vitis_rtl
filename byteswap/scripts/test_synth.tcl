@@ -12,10 +12,12 @@ set include_dir [lindex $::argv 3]
 create_project batch_synthesis_test $build_dir/synthesis_test -part xcu250-figd2104-2L-e
 set_property board_part xilinx.com:au250:part0:1.3 [current_project]
 add_files [glob $src_dir/*.v $src_dir/*.sv $include_dir/*.v $include_dir/*.sv]
+set_property top $top_file [current_fileset]
+set_property top_file {$src_dir/$top_file} [current_fileset]
 update_compile_order -fileset sources_1
 update_compile_order -fileset sources_1
 check_syntax
-if { $::argc == 4 } {
+if { $::argc == 5 } {
     synth_design -top $top_file -rtl
 } else {
     synth_design -top $top_file
