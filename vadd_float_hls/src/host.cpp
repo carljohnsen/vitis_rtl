@@ -4,8 +4,8 @@
 #include <time.h>
 #include "hlslib/xilinx/SDAccel.h"
 
-//#define DATA_SIZE 4096
-#define DATA_SIZE 16
+#define DATA_SIZE 4096
+//#define DATA_SIZE 16
 
 int main(int argc, char **argv) {
     // Check the arguments and load them
@@ -63,9 +63,10 @@ int main(int argc, char **argv) {
     const auto kou = kernel_out.ExecuteTaskFork();
 
     // Wait for the kernels to finish
-    kin.wait();
+    //kin.wait();
     //kad.wait();
     kou.wait();
+    //program.context().commandQueue().finish();
 
     // Copy back the results
     out.CopyToHost(result.begin());
