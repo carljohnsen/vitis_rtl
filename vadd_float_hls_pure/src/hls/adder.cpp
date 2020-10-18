@@ -31,7 +31,7 @@ extern "C" {
             ap_uint<DATA_WIDTH> c = cf.u;
             tmp.data = c;
             tmp.last = a.last;
-            eos = a.last
+            eos = a.last;
             out.write(tmp);
         } while (!eos);
     }

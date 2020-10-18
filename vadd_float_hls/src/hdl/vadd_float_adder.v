@@ -31,10 +31,28 @@ localparam integer LP_FIFO_DEPTH = 16;
 localparam integer LP_FIFO_COUNT_WIDTH = $clog2(LP_FIFO_DEPTH)+1;
 localparam integer LP_FIFO_READ_LATENCY = 2; // 2: Registered output on BRAM, 1: Registered output on LUTRAM
 
-assign s_axis_a_tready = ~fifoa_full;
-assign s_axis_b_tready = ~fifob_full;
+wire                          fla_tvalid;
+wire                          fla_tready;
+wire [C_AXIS_TDATA_WIDTH-1:0] fla_tdata;
+wire                          fla_tlast;
+
+wire                          flb_tvalid;
+wire                          flb_tready;
+wire [C_AXIS_TDATA_WIDTH-1:0] flb_tdata;
+wire                          flb_tlast;
+
+wire                          flc_tvalid;
+wire                          flc_tready;
+wire [C_AXIS_TDATA_WIDTH-1:0] flc_tdata;
+wire                          flc_tlast;
+
 wire fifoa_full;
 wire fifob_full;
+wire fifoc_full;
+
+assign s_axis_a_tready = ~fifoa_full;
+assign s_axis_b_tready = ~fifob_full;
+assign flc_tready      = ~fifoc_full;
 
 xpm_fifo_sync # (
   .FIFO_MEMORY_TYPE    ( "auto"               ) , // string; "auto", "block", "distributed", or "ultra";
@@ -126,16 +144,6 @@ inst_fifo_b (
   .dbiterr       (                             )
 );
 
-wire                         fla_tvalid;
-wire                         fla_tready;
-wire [C_AXIS_TDATA_WIDTH-1:0] fla_tdata;
-wire                         fla_tlast;
-
-wire                         flb_tvalid;
-wire                         flb_tready;
-wire [C_AXIS_TDATA_WIDTH-1:0] flb_tdata;
-wire                         flb_tlast;
-
 floating_point_0 inst_float_add (
     .aclk            (ap_aclk),
     .s_axis_a_tvalid (fla_tvalid),
@@ -153,14 +161,6 @@ floating_point_0 inst_float_add (
     .m_axis_result_tdata  (flc_tdata),
     .m_axis_result_tlast  (flc_tlast)
 );
-
-wire                         flc_tvalid;
-wire                         flc_tready;
-wire [C_AXIS_TDATA_WIDTH-1:0] flc_tdata;
-wire                         flc_tlast;
-
-assign flc_tready = ~fifoc_full;
-wire fifoc_full;
 
 xpm_fifo_sync # (
   .FIFO_MEMORY_TYPE    ( "auto"               ) , // string; "auto", "block", "distributed", or "ultra";
@@ -206,7 +206,6 @@ inst_fifo_c (
   .sbiterr       (                             ) ,
   .dbiterr       (                             )
 );
-
 
 endmodule
 

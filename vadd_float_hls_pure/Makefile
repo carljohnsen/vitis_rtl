@@ -8,8 +8,8 @@ build/obj/reader.xo: src/hls/reader.cpp
 build/obj/writer.xo: src/hls/writer.cpp
 	v++ -t $(TARGET) --config ./connections.ini --platform xilinx_u250_xdma_201830_2 -c -k writer -o build/obj/writer.xo src/hls/writer.cpp
 
-#build/obj/vadd_float.xo: src/hls/adder.cpp
-#	v++ -t $(TARGET) --config ./connections.ini --platform xilinx_u250_xdma_201830_2 -c -k vadd_float -o build/obj/vadd_float.xo src/hls/adder.cpp
+build/obj/vadd_float.xo: src/hls/adder.cpp
+	v++ -t $(TARGET) --config ./connections.ini --platform xilinx_u250_xdma_201830_2 -c -k vadd_float -o build/obj/vadd_float.xo src/hls/adder.cpp
 
 build/bin/float_vadd.link.xclbin: build/obj/reader.xo build/obj/writer.xo build/obj/vadd_float.xo
 	v++ -t $(TARGET) --platform xilinx_u250_xdma_201830_2 -l --config ./connections.ini -o build/bin/float_vadd.link.xclbin build/obj/reader.xo build/obj/vadd_float.xo build/obj/writer.xo

@@ -39,6 +39,8 @@ make run
 - [Byteswap](byteswap/) - Swaps the order of bytes in each input, so the least significant byte becomes the most significant byte.
 - [Vector add](vadd/) - Sums the two input vectors. It is a modified version of the [Xilinx](https://github.com/Xilinx/Vitis_Accel_Examples/tree/master/rtl_kernels/rtl_vadd) sample.
 - [Vector add floating point](vadd_float/) - Same as Vector add, but uses the [Xilinx Floating Point IP](https://www.xilinx.com/support/documentation/ip_documentation/floating_point/v7_1/pg060-floating-point.pdf) for the addition.
+- [Vector add floating point hls](vadd_float_hls/) - Multi kernel Vector add, with HLS for memory management and with RTL as compute kernel.
+- [Vector add floating point hls pure](vadd_float_hls_pure) - Multi kernel Vector add, written purely in HLS.
 
 # Utilities
 - `utils.mk` - a library of commonly used Makefile rules and variables.

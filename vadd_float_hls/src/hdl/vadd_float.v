@@ -51,36 +51,42 @@ module vadd_float #(
 
 (* DONT_TOUCH = "yes" *)
 reg                                 areset                         = 1'b0;
-//reg ap_idle = 1'b1;
-//reg ap_done = 1'b0;
-//wire ap_start;
-//reg ap_start_r = 1'b0;
-//wire ap_start_pulse;
+wire ap_idle;
+reg ap_idle_r = 1'b1;
+wire ap_done;
+reg ap_done_r = 1'b0;
+wire ap_start;
+reg ap_start_r = 1'b0;
+wire ap_start_pulse;
 
 always @(posedge ap_clk) begin
   areset <= ~ap_rst_n;
 end
 
-//always @(posedge ap_clk) begin
-//    ap_start_r <= ap_start;
-//end
-//assign ap_start_pulse = ap_start & ~ap_start_r;
-//
-//always @(posedge ap_clk) begin
-//    if (areset) begin
-//        ap_idle <= 1'b1;
-//    end else begin
-//        ap_idle <= ap_done ? 1'b1 : ap_start_pulse ? 1'b0 : ap_idle;
-//    end
-//end
-//
-//always @(posedge ap_clk) begin
-//    if (areset) begin
-//        ap_done <= 1'b0;
-//    end else begin
-//        ap_done <= ap_done ? 1'b0 : 1'b1;
-//    end
-//end
+always @(posedge ap_clk) begin
+    begin
+        ap_start_r <= ap_start;
+    end
+end
+assign ap_start_pulse = ap_start & ~ap_start_r;
+
+always @(posedge ap_clk) begin
+    if (areset) begin
+        ap_idle_r <= 1'b1;
+    end else begin
+        ap_idle_r <= ap_done ? 1'b1 : ap_start_pulse ? 1'b0 : ap_idle;
+    end
+end
+assign ap_idle = ap_idle_r;
+
+always @(posedge ap_clk) begin
+    if (areset) begin
+        ap_done_r <= 1'b0;
+    end else begin
+        ap_done_r <= ap_done ? 1'b0 : m_axis_c_tlast;
+    end
+end
+assign ap_done = ap_done_r;
 
 vadd_float_control #(
   .C_S_AXI_ADDR_WIDTH ( C_S_AXI_CONTROL_ADDR_WIDTH ),
@@ -107,10 +113,11 @@ inst_vadd_float_control (
   .BVALID     ( s_axi_control_bvalid ),
   .BREADY     ( s_axi_control_bready ),
   .BRESP      ( s_axi_control_bresp ),
-  //.ap_start   ( ap_start ),
-  //.ap_done    ( ap_done ),
-  //.ap_ready   ( ap_done ),
-  //.ap_idle    ( ap_idle )
+  .ap_start   ( ap_start ),
+  .ap_done    ( ap_done ),
+  .ap_ready   ( ap_done ),
+  .ap_idle    ( ap_idle ),
+  .interrupt  ( )
 );
 
 vadd_float_adder #(
