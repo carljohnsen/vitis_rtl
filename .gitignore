@@ -8,3 +8,5 @@
 */xrc.log
 */.ipcache
 *.swp
+*/.Xil
+bash_source.sh
