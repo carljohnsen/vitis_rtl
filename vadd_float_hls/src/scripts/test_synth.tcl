@@ -1,6 +1,6 @@
 if { !($::argc == 4 || $::argc == 5) } {
-    puts "Error: Program \"$::argv0\" requires 2-3 arguments.\n"
-    puts "Usage: $::argv0 <srcdir> <top_file> <builddir> <include_dir> (elaborate)\n"
+    puts "Error: Program \"$::argv0\" requires 4-5 arguments.\n"
+    puts "Usage: $::argv0 <srcdir> <top_file> <build_dir> <include_dir> (elaborate)\n"
     exit
 }
 
