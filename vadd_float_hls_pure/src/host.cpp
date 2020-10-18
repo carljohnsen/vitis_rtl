@@ -4,8 +4,8 @@
 #include <time.h>
 #include "hlslib/xilinx/SDAccel.h"
 
-//#define DATA_SIZE 4096
-#define DATA_SIZE 128 * 1024
+#define DATA_SIZE 4096
+//#define DATA_SIZE 128 * 1024
 //#define DATA_SIZE 16
 
 int main(int argc, char **argv) {
@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
 
     // Create the kernels
     auto kernel_in = program.MakeKernel("reader", ina, inb, size);
-    auto kernel_vadd = program.MakeKernel("vadd_float");
+    auto kernel_vadd = program.MakeKernel("adder");
     auto kernel_out = program.MakeKernel("writer", out);
 
     // Execute kernel

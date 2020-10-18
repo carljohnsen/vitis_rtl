@@ -12,7 +12,7 @@ typedef union {
 } uni;
 
 extern "C" {
-    void vadd_float(hls::stream<ap_axiu<DATA_WIDTH,0,0,0>> &ina, hls::stream<ap_axiu<DATA_WIDTH,0,0,0>> &inb, hls::stream<ap_axiu<DATA_WIDTH,0,0,0>> &out) {
+    void adder(hls::stream<ap_axiu<DATA_WIDTH,0,0,0>> &ina, hls::stream<ap_axiu<DATA_WIDTH,0,0,0>> &inb, hls::stream<ap_axiu<DATA_WIDTH,0,0,0>> &out) {
 #pragma HLS INTERFACE axis port=ina depth=16
 #pragma HLS INTERFACE axis port=inb depth=16
 #pragma HLS INTERFACE axis port=out depth=16
