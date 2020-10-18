@@ -1,7 +1,7 @@
 `default_nettype none
 `timescale 1 ns / 1 ps
 
-module byteswap_top #(
+module byteswap #(
     parameter integer C_S_AXI_CONTROL_ADDR_WIDTH = 12,
     parameter integer C_S_AXI_CONTROL_DATA_WIDTH = 32,
     parameter integer C_M00_AXI_ADDR_WIDTH       = 64,
@@ -108,7 +108,7 @@ inst_control_slave (
 );
 
 // Controller
-byteswap #(
+byteswap_int #(
     .C_M00_AXI_ADDR_WIDTH ( C_M00_AXI_ADDR_WIDTH ),
     .C_M00_AXI_DATA_WIDTH ( C_M00_AXI_DATA_WIDTH ),
     .C_XFER_SIZE_WIDTH    ( C_XFER_SIZE_WIDTH ),

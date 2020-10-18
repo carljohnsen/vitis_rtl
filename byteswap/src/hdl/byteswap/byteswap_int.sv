@@ -1,6 +1,6 @@
 `default_nettype none
 
-module byteswap #(
+module byteswap_int #(
     parameter integer C_M00_AXI_ADDR_WIDTH = 64,
     parameter integer C_M00_AXI_DATA_WIDTH = 512,
     parameter integer C_XFER_SIZE_WIDTH    = 32,
@@ -221,5 +221,5 @@ inst_axi_write_master (
 
 assign ap_done_i[0] = write_done;
 
-endmodule : byteswap
+endmodule : byteswap_int
 `default_nettype wire

@@ -1,3 +1,5 @@
 TARGET = hw_emu
-KERNEL = byteswap_top
+NAME = byteswap
+RTL_KERNELS = byteswap
+
 include ../utils/utils.mk
