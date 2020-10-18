@@ -1,9 +1,9 @@
 #
 # Argument parsing
 #
-if { $::argc != 4 } {
+if { $::argc != 5 } {
     puts "Error: Program \"$::argv0\" requires 4 arguments.\n"
-    puts "Usage: $::argv0 <xoname> <kernel_name> <build_dir> <rtl_src_dir>\n"
+    puts "Usage: $::argv0 <xoname> <kernel_name> <build_dir> <rtl_src_dir> <include_dir>\n"
     exit
 }
 # TODO muligvis have memory bus navn?
@@ -12,6 +12,7 @@ set xoname      [lindex $::argv 0]
 set kernel_name [lindex $::argv 1]
 set build_dir   [lindex $::argv 2]
 set src_dir     [lindex $::argv 3]
+set include_dir [lindex $::argv 4]
 
 set tmp_dir "$build_dir/tmp"
 set pkg_dir "$build_dir/pkg"

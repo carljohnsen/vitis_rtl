@@ -4,7 +4,7 @@
 `default_nettype none
 `timescale 1 ns / 1 ps
 // Top level of the kernel. Do not modify module name, parameters or ports.
-module vadd_float_top #(
+module vadd_float #(
   parameter integer C_S_AXI_CONTROL_ADDR_WIDTH = 12 ,
   parameter integer C_S_AXI_CONTROL_DATA_WIDTH = 32 ,
   parameter integer C_M00_AXI_ADDR_WIDTH       = 64 ,
@@ -147,7 +147,7 @@ inst_control_s_axi (
 ///////////////////////////////////////////////////////////////////////////////
 
 // Example RTL block.  Remove to insert custom logic.
-vadd_float #(
+vadd_float_int #(
   .C_M00_AXI_ADDR_WIDTH ( C_M00_AXI_ADDR_WIDTH ),
   .C_M00_AXI_DATA_WIDTH ( C_M00_AXI_DATA_WIDTH )
 )

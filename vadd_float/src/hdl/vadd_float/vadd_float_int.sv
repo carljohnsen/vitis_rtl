@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // default_nettype of none prevents implicit wire declaration.
 `default_nettype none
-module vadd_float #(
+module vadd_float_int #(
   parameter integer C_M00_AXI_ADDR_WIDTH = 64 ,
   parameter integer C_M00_AXI_DATA_WIDTH = 512
 )
@@ -149,5 +149,5 @@ inst_example_vadd_m00_axi (
 );
 
 
-endmodule : vadd_float
+endmodule : vadd_float_int
 `default_nettype wire

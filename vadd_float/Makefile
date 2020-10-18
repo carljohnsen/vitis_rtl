@@ -1,3 +1,5 @@
 TARGET = hw_emu
-KERNEL = vadd_float_top
+NAME = vadd_float
+RTL_KERNELS = vadd_float
+
 include ../utils/utils.mk

@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
     gmem.CopyFromHost(input_data.begin());
 
     // Create the kernel
-    auto kernel = program.MakeKernel("vadd_float_top", size, gmem);
+    auto kernel = program.MakeKernel("vadd_float", size, gmem);
 
     // Execute kernel
     const auto elapsed = kernel.ExecuteTask();
