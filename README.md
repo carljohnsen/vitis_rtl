@@ -35,6 +35,36 @@ And to run a project:
 make run
 ```
 
+# File structure
+```
+.
+|-- Makefile
+`-- src/
+    |-- configs/
+    |   |-- build.ini
+    |   |-- link.ini
+    |   `-- package.ini
+    |
+    |-- hdl/
+    |   |-- rtl_kernel_0/
+    |   |   |-- *.v
+    |   |   `-- *.sv
+    |   |
+    |   `-- rtl_kernel_1/
+    |       |-- *.v
+    |       `-- *.sv
+    |
+    |-- hls/
+    |   |-- hls_kernel_0.cpp
+    |   `-- hls_kernel_1.cpp
+    |
+    |-- host.cpp
+    |
+    `-- scripts/
+        |-- package_kernel.tcl
+        `-- test_synth.tcl
+```
+
 # Projects
 - [Byteswap](byteswap/) - Swaps the order of bytes in each input, so the least significant byte becomes the most significant byte.
 - [Vector add](vadd/) - Sums the two input vectors. It is a modified version of the [Xilinx](https://github.com/Xilinx/Vitis_Accel_Examples/tree/master/rtl_kernels/rtl_vadd) sample.
@@ -48,3 +78,6 @@ make run
 - `package_kernel.tcl` - TODO a template TCL script containing most of the generic boilerplate Vivado project TCL code.
 - `test_synthesis.tcl` - TODO a template TCL script for testing whether the RTL code can be synthesized.
 - `empty_project` - TODO an empty project containing the basic requirements for a project, such as `Makefile` and folder structure.
+
+
+6 directories, 11 files

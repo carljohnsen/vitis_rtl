@@ -26,6 +26,7 @@ set_property -dict [list CONFIG.Add_Sub_Value {Add} CONFIG.Has_ARESETn {true} CO
 generate_target all [get_ips]
 update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1
+check_syntax
 set_property top $kernel_name [current_fileset]
 set_property top_file {$src_dir/$kernel_name} [current_fileset]
 ipx::package_project -root_dir $pkg_dir -vendor xilinx.com -library RTLKernel -taxonomy /KernelIP -import_files -set_current false
