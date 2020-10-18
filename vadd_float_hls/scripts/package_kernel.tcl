@@ -6,7 +6,7 @@ if { $::argc != 5 } {
     puts "Usage: $::argv0 <xoname> <kernel_name> <build_dir> <rtl_src_dir> <include_dir>\n"
     exit
 }
-# TODO muligvis have memory bus navn?
+
 set xoname      [lindex $::argv 0]
 set kernel_name [lindex $::argv 1]
 set build_dir   [lindex $::argv 2]
@@ -22,9 +22,8 @@ set pkg_dir "$build_dir/pkg"
 create_project kernel_packing $tmp_dir
 add_files [glob $src_dir/*.v $src_dir/*.sv $include_dir/*.v $include_dir/*.sv]
 create_ip -name floating_point -vendor xilinx.com -library ip -version 7.1 -module_name floating_point_0
-set_property -dict [list CONFIG.Add_Sub_Value {Add} CONFIG.Has_A_TLAST {true} CONFIG.Has_A_TUSER {false} CONFIG.Has_B_TLAST {true} CONFIG.Has_B_TUSER {false} CONFIG.RESULT_TLAST_Behv {OR_all_TLASTs}] [get_ips floating_point_0]
+set_property -dict [list CONFIG.Add_Sub_Value {Add} CONFIG.Has_ARESETn {true} CONFIG.Has_A_TLAST {true} CONFIG.Has_A_TUSER {false} CONFIG.Has_B_TLAST {true} CONFIG.Has_B_TUSER {false} CONFIG.RESULT_TLAST_Behv {OR_all_TLASTs}] [get_ips floating_point_0]
 generate_target all [get_ips]
-#synth_ip [get_ips]
 update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1
 set_property top $kernel_name [current_fileset]
@@ -42,7 +41,6 @@ foreach up [ipx::get_user_parameters] {
 ipx::create_xgui_files       $core
 set_property supported_families        { }                           $core
 set_property auto_family_support_level level_2                       $core
-#set_property used_in {out_of_context implementation synthesis} [::ipx::get_files -type xdc -of_objects [::ipx::get_file_groups "xilinx_anylanguagesynthesis" -of_objects $core] *_ooc.xdc]
 
 ipx::associate_bus_interfaces -busif s_axi_control -clock ap_clk $core
 ipx::associate_bus_interfaces -busif s_axis_a -clock ap_clk $core

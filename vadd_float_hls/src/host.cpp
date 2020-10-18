@@ -4,9 +4,7 @@
 #include <time.h>
 #include "hlslib/xilinx/SDAccel.h"
 
-//#define DATA_SIZE 4096
-#define DATA_SIZE 128 * 1024
-//#define DATA_SIZE 16
+#define DATA_SIZE 4096
 
 int main(int argc, char **argv) {
     // Check the arguments and load them
@@ -39,9 +37,9 @@ int main(int argc, char **argv) {
     auto ina = context.MakeBuffer<float, hlslib::ocl::Access::read>(
             hlslib::ocl::MemoryBank::bank0, size);
     auto inb = context.MakeBuffer<float, hlslib::ocl::Access::read>(
-            hlslib::ocl::MemoryBank::bank0, size);
+            hlslib::ocl::MemoryBank::bank1, size);
     auto out = context.MakeBuffer<float, hlslib::ocl::Access::write>(
-            hlslib::ocl::MemoryBank::bank0, size);
+            hlslib::ocl::MemoryBank::bank2, size);
 
     // Copy to device
     ina.CopyFromHost(input_a.begin());
@@ -52,7 +50,7 @@ int main(int argc, char **argv) {
     auto kernel_vadd = program.MakeKernel("vadd_float");
     auto kernel_out = program.MakeKernel("writer", out);
 
-    // Execute kernel
+    // Execute kernels
     const auto kin = kernel_in.ExecuteTaskFork();
     const auto kad = kernel_vadd.ExecuteTaskFork();
     const auto kou = kernel_out.ExecuteTaskFork();
@@ -68,8 +66,9 @@ int main(int argc, char **argv) {
     for (int i = 0; i < size; i++) {
         if (abs(expected_result[i] - result[i]) > .00001) {
             std::cout << "Error: Result mismatch" << std::endl;
-            std::cout << "i = " << i << " Software result = " << expected_result[i]
-                      << " Device result = " << result[i] << std::endl;
+            std::cout << "i = " << i
+                << " Software result = " << expected_result[i]
+                << " Device result = " << result[i] << std::endl;
             match = 1;
         }
     }

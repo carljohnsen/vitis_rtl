@@ -14,7 +14,7 @@ set_property board_part xilinx.com:au250:part0:1.3 [current_project]
 add_files [glob $src_dir/*.v $src_dir/*.sv $include_dir/*.v $include_dir/*.sv]
 
 create_ip -name floating_point -vendor xilinx.com -library ip -version 7.1 -module_name floating_point_0
-set_property -dict [list CONFIG.Add_Sub_Value {Add} CONFIG.Has_A_TLAST {true} CONFIG.Has_A_TUSER {false} CONFIG.Has_B_TLAST {true} CONFIG.Has_B_TUSER {false} CONFIG.RESULT_TLAST_Behv {OR_all_TLASTs}] [get_ips floating_point_0]
+set_property -dict [list CONFIG.Add_Sub_Value {Add} CONFIG.Has_ARESETn {true} CONFIG.Has_A_TLAST {true} CONFIG.Has_A_TUSER {false} CONFIG.Has_B_TLAST {true} CONFIG.Has_B_TUSER {false} CONFIG.RESULT_TLAST_Behv {OR_all_TLASTs}] [get_ips floating_point_0]
 
 set_property top $top_file [current_fileset]
 set_property top_file {$src_dir/$top_file} [current_fileset]

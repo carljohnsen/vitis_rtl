@@ -2,65 +2,63 @@
 `timescale 1 ns / 1 ps
 
 module vadd_float #(
-  parameter integer C_S_AXI_CONTROL_ADDR_WIDTH = 12,
-  parameter integer C_S_AXI_CONTROL_DATA_WIDTH = 32,
-  parameter integer C_AXIS_TDATA_WIDTH          = 32
+    parameter integer C_S_AXI_CONTROL_ADDR_WIDTH = 12,
+    parameter integer C_S_AXI_CONTROL_DATA_WIDTH = 32,
+    parameter integer C_AXIS_TDATA_WIDTH         = 32
 )
 (
-  // System Signals
-  input  wire                                    ap_clk,
-  input  wire                                    ap_rst_n,
+    input  wire                                    ap_clk,
+    input  wire                                    ap_rst_n,
 
-  // AXI4-Lite slave interface
-  input  wire                                    s_axi_control_awvalid,
-  output wire                                    s_axi_control_awready,
-  input  wire [C_S_AXI_CONTROL_ADDR_WIDTH-1:0]   s_axi_control_awaddr,
-  input  wire                                    s_axi_control_wvalid,
-  output wire                                    s_axi_control_wready,
-  input  wire [C_S_AXI_CONTROL_DATA_WIDTH-1:0]   s_axi_control_wdata,
-  input  wire [C_S_AXI_CONTROL_DATA_WIDTH/8-1:0] s_axi_control_wstrb,
-  input  wire                                    s_axi_control_arvalid,
-  output wire                                    s_axi_control_arready,
-  input  wire [C_S_AXI_CONTROL_ADDR_WIDTH-1:0]   s_axi_control_araddr,
-  output wire                                    s_axi_control_rvalid,
-  input  wire                                    s_axi_control_rready,
-  output wire [C_S_AXI_CONTROL_DATA_WIDTH-1:0]   s_axi_control_rdata,
-  output wire [2-1:0]                            s_axi_control_rresp,
-  output wire                                    s_axi_control_bvalid,
-  input  wire                                    s_axi_control_bready,
-  output wire [2-1:0]                            s_axi_control_bresp,
+    input  wire                                    s_axi_control_awvalid,
+    output wire                                    s_axi_control_awready,
+    input  wire [C_S_AXI_CONTROL_ADDR_WIDTH-1:0]   s_axi_control_awaddr,
+    input  wire                                    s_axi_control_wvalid,
+    output wire                                    s_axi_control_wready,
+    input  wire [C_S_AXI_CONTROL_DATA_WIDTH-1:0]   s_axi_control_wdata,
+    input  wire [C_S_AXI_CONTROL_DATA_WIDTH/8-1:0] s_axi_control_wstrb,
+    input  wire                                    s_axi_control_arvalid,
+    output wire                                    s_axi_control_arready,
+    input  wire [C_S_AXI_CONTROL_ADDR_WIDTH-1:0]   s_axi_control_araddr,
+    output wire                                    s_axi_control_rvalid,
+    input  wire                                    s_axi_control_rready,
+    output wire [C_S_AXI_CONTROL_DATA_WIDTH-1:0]   s_axi_control_rdata,
+    output wire [2-1:0]                            s_axi_control_rresp,
+    output wire                                    s_axi_control_bvalid,
+    input  wire                                    s_axi_control_bready,
+    output wire [2-1:0]                            s_axi_control_bresp,
 
-  input  wire                            s_axis_a_tvalid,
-  input  wire [C_AXIS_TDATA_WIDTH-1:0]   s_axis_a_tdata,
-  output wire                            s_axis_a_tready,
-  input  wire [C_AXIS_TDATA_WIDTH/8-1:0] s_axis_a_tkeep,
-  input  wire                            s_axis_a_tlast,
+    input  wire                            s_axis_a_tvalid,
+    input  wire [C_AXIS_TDATA_WIDTH-1:0]   s_axis_a_tdata,
+    output wire                            s_axis_a_tready,
+    input  wire [C_AXIS_TDATA_WIDTH/8-1:0] s_axis_a_tkeep,
+    input  wire                            s_axis_a_tlast,
 
-  input  wire                            s_axis_b_tvalid,
-  input  wire [C_AXIS_TDATA_WIDTH-1:0]   s_axis_b_tdata,
-  output wire                            s_axis_b_tready,
-  input  wire [C_AXIS_TDATA_WIDTH/8-1:0] s_axis_b_tkeep,
-  input  wire                            s_axis_b_tlast,
+    input  wire                            s_axis_b_tvalid,
+    input  wire [C_AXIS_TDATA_WIDTH-1:0]   s_axis_b_tdata,
+    output wire                            s_axis_b_tready,
+    input  wire [C_AXIS_TDATA_WIDTH/8-1:0] s_axis_b_tkeep,
+    input  wire                            s_axis_b_tlast,
 
-  output wire                            m_axis_c_tvalid,
-  output wire [C_AXIS_TDATA_WIDTH-1:0]   m_axis_c_tdata,
-  input  wire                            m_axis_c_tready,
-  output wire [C_AXIS_TDATA_WIDTH/8-1:0] m_axis_c_tkeep,
-  output wire                            m_axis_c_tlast
+    output wire                            m_axis_c_tvalid,
+    output wire [C_AXIS_TDATA_WIDTH-1:0]   m_axis_c_tdata,
+    input  wire                            m_axis_c_tready,
+    output wire [C_AXIS_TDATA_WIDTH/8-1:0] m_axis_c_tkeep,
+    output wire                            m_axis_c_tlast
 );
 
 (* DONT_TOUCH = "yes" *)
 reg                                 areset                         = 1'b0;
 wire ap_idle;
-reg ap_idle_r = 1'b1;
+reg  ap_idle_r = 1'b1;
 wire ap_done;
-reg ap_done_r = 1'b0;
+reg  ap_done_r = 1'b0;
 wire ap_start;
-reg ap_start_r = 1'b0;
+reg  ap_start_r = 1'b0;
 wire ap_start_pulse;
 
 always @(posedge ap_clk) begin
-  areset <= ~ap_rst_n;
+    areset <= ~ap_rst_n;
 end
 
 always @(posedge ap_clk) begin
@@ -89,35 +87,35 @@ end
 assign ap_done = ap_done_r;
 
 vadd_float_control #(
-  .C_S_AXI_ADDR_WIDTH ( C_S_AXI_CONTROL_ADDR_WIDTH ),
-  .C_S_AXI_DATA_WIDTH ( C_S_AXI_CONTROL_DATA_WIDTH )
+    .C_S_AXI_ADDR_WIDTH ( C_S_AXI_CONTROL_ADDR_WIDTH ),
+    .C_S_AXI_DATA_WIDTH ( C_S_AXI_CONTROL_DATA_WIDTH )
 )
 inst_vadd_float_control (
-  .ACLK       ( ap_clk ),
-  .ARESET     ( areset ),
-  .ACLK_EN    ( 1'b1 ),
-  .AWVALID    ( s_axi_control_awvalid ),
-  .AWREADY    ( s_axi_control_awready ),
-  .AWADDR     ( s_axi_control_awaddr ),
-  .WVALID     ( s_axi_control_wvalid ),
-  .WREADY     ( s_axi_control_wready ),
-  .WDATA      ( s_axi_control_wdata ),
-  .WSTRB      ( s_axi_control_wstrb ),
-  .ARVALID    ( s_axi_control_arvalid ),
-  .ARREADY    ( s_axi_control_arready ),
-  .ARADDR     ( s_axi_control_araddr ),
-  .RVALID     ( s_axi_control_rvalid ),
-  .RREADY     ( s_axi_control_rready ),
-  .RDATA      ( s_axi_control_rdata ),
-  .RRESP      ( s_axi_control_rresp ),
-  .BVALID     ( s_axi_control_bvalid ),
-  .BREADY     ( s_axi_control_bready ),
-  .BRESP      ( s_axi_control_bresp ),
-  .ap_start   ( ap_start ),
-  .ap_done    ( ap_done ),
-  .ap_ready   ( ap_done ),
-  .ap_idle    ( ap_idle ),
-  .interrupt  ( )
+    .ACLK       ( ap_clk ),
+    .ARESET     ( areset ),
+    .ACLK_EN    ( 1'b1 ),
+    .AWVALID    ( s_axi_control_awvalid ),
+    .AWREADY    ( s_axi_control_awready ),
+    .AWADDR     ( s_axi_control_awaddr ),
+    .WVALID     ( s_axi_control_wvalid ),
+    .WREADY     ( s_axi_control_wready ),
+    .WDATA      ( s_axi_control_wdata ),
+    .WSTRB      ( s_axi_control_wstrb ),
+    .ARVALID    ( s_axi_control_arvalid ),
+    .ARREADY    ( s_axi_control_arready ),
+    .ARADDR     ( s_axi_control_araddr ),
+    .RVALID     ( s_axi_control_rvalid ),
+    .RREADY     ( s_axi_control_rready ),
+    .RDATA      ( s_axi_control_rdata ),
+    .RRESP      ( s_axi_control_rresp ),
+    .BVALID     ( s_axi_control_bvalid ),
+    .BREADY     ( s_axi_control_bready ),
+    .BRESP      ( s_axi_control_bresp ),
+    .ap_start   ( ap_start ),
+    .ap_done    ( ap_done ),
+    .ap_ready   ( ap_done ),
+    .ap_idle    ( ap_idle ),
+    .interrupt  ( )
 );
 
 vadd_float_adder #(
