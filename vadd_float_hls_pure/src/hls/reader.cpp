@@ -12,7 +12,7 @@ typedef union {
 } uni;
 
 extern "C" {
-    void reader(float *ina, float *inb, int size, hls::stream<ap_axiu<DATA_WIDTH,0,0,0>> &outa, hls::stream<ap_axiu<DATA_WIDTH,0,0,0>> &outb) {
+    void reader(float *in_a, float *in_b, int size, hls::stream<ap_axiu<DATA_WIDTH,0,0,0>> &out_a, hls::stream<ap_axiu<DATA_WIDTH,0,0,0>> &out_b) {
 #pragma HLS INTERFACE m_axi port=ina offset=slave bundle=gmem
 #pragma HLS INTERFACE m_axi port=inb offset=slave bundle=gmem
 #pragma HLS INTERFACE axis port=outa depth=16
@@ -22,20 +22,18 @@ extern "C" {
 #pragma HLS INTERFACE s_axilite port=size
 #pragma HLS INTERFACE s_axilite port=return
 
-        ap_axiu<DATA_WIDTH,0,0,0> tmpa;
-        ap_axiu<DATA_WIDTH,0,0,0> tmpb;
+        ap_axiu<DATA_WIDTH,0,0,0> tmp_a, tmp_b;
+        uni tmp_data_a, tmp_data_b;
         int i = 0;
         for (i = 0; i < size; i++) {
-            uni a;
-            a.f = ina[i];
-            uni b;
-            b.f = inb[i];
-            tmpa.data = a.u;
-            tmpb.data = b.u;
-            tmpa.last = i == size-1;
-            tmpb.last = i == size-1;
-            outa.write(tmpa);
-            outb.write(tmpb);
+            tmp_data_a.f = in_a[i];
+            tmp_data_b.f = in_b[i];
+            tmp_a.data = tmp_data_a.u;
+            tmp_b.data = tmp_data_b.u;
+            tmp_a.last = i == size-1;
+            tmp_b.last = i == size-1;
+            out_a.write(tmp_a);
+            out_b.write(tmp_b);
         }
     }
 }

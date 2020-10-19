@@ -19,11 +19,12 @@ extern "C" {
 #pragma HLS INTERFACE s_axilite port=return
         auto eos = false;
         int i = 0;
+        ap_axiu<DATA_WIDTH,0,0,0> tmp;
+        uni tmp_data;
         do {
-            ap_axiu<DATA_WIDTH,0,0,0> tmp = inp.read();
-            uni data;
-            data.u = tmp.data;
-            out[i] = data.f;
+            tmp = inp.read();
+            tmp_data.u = tmp.data;
+            out[i] = tmp_data.f;
             i++;
             eos = tmp.last;
         } while (!eos);
