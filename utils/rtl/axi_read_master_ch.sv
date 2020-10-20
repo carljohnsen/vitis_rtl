@@ -112,7 +112,8 @@ logic                                                         fifo_stall;
 logic                                                         arxfer;
 logic                                                         arvalid_r = 1'b0;
 logic [C_NUM_CHANNELS-1:0][C_ADDR_WIDTH-1:0]                  addr;
-logic [C_ID_WIDTH-1:0]                                        id = {C_ID_WIDTH{1'b0}};
+// TODO this needs to be reset as the maximum value
+logic [C_ID_WIDTH-1:0]                                        id = {C_ID_WIDTH{1'b1}};
 logic [LP_TRANSACTION_CNTR_WIDTH-1:0]                         ar_transactions_to_go;
 logic                                                         ar_final_transaction;
 logic [C_NUM_CHANNELS-1:0]                                    incr_ar_to_r_cnt;
@@ -191,7 +192,8 @@ end
 // each channel is assigned a different id. The transactions are interleaved.
 always @(posedge aclk) begin
   if (start) begin
-    id <= {C_ID_WIDTH{1'b0}};
+      // TODO this needs to be reset to maximum id
+    id <= {C_ID_WIDTH{1'b1}};
   end
   else begin
     id <= arxfer ? (id - 1'b1) % C_NUM_CHANNELS : id;

@@ -247,14 +247,15 @@ inst_krnl_vadd_control_s_axi (
 
 // AXI4 Read Master
 axi_read_master_ch #(
-    .C_ADDR_WIDTH      ( C_M_AXI_GMEM_ADDR_WIDTH ),
-    .C_DATA_WIDTH      ( C_M_AXI_GMEM_DATA_WIDTH ),
-    .C_ID_WIDTH        ( C_M_AXI_GMEM_ID_WIDTH ),
-    .C_NUM_CHANNELS    ( LP_NUM_READ_CHANNELS ),
-    .C_LENGTH_WIDTH    ( LP_LENGTH_WIDTH ),
-    .C_BURST_LEN       ( LP_AXI_BURST_LEN ),
-    .C_LOG_BURST_LEN   ( LP_LOG_BURST_LEN ),
-    .C_MAX_OUTSTANDING ( LP_RD_MAX_OUTSTANDING )
+    .C_ADDR_WIDTH        ( C_M_AXI_GMEM_ADDR_WIDTH ),
+    .C_DATA_WIDTH        ( C_M_AXI_GMEM_DATA_WIDTH ),
+    .C_ID_WIDTH          ( C_M_AXI_GMEM_ID_WIDTH ),
+    .C_NUM_CHANNELS      ( LP_NUM_READ_CHANNELS ),
+    .C_LENGTH_WIDTH      ( LP_LENGTH_WIDTH ),
+    .C_BURST_LEN         ( LP_AXI_BURST_LEN ),
+    .C_LOG_BURST_LEN     ( LP_LOG_BURST_LEN ),
+    .C_MAX_OUTSTANDING   ( LP_RD_MAX_OUTSTANDING ),
+    .C_INCLUDE_DATA_FIFO ( 1 )
 )
 inst_axi_read_master (
     .aclk           ( ap_clk ),
@@ -304,11 +305,11 @@ inst_adder (
 
 // AXI4 Write Master
 axi_write_master_ch #(
-    .C_ADDR_WIDTH       ( C_M_AXI_GMEM_ADDR_WIDTH ),
-    .C_DATA_WIDTH       ( C_M_AXI_GMEM_DATA_WIDTH ),
-    .C_MAX_LENGTH_WIDTH ( LP_LENGTH_WIDTH ),
-    .C_BURST_LEN ( LP_AXI_BURST_LEN ),
-    .C_LOG_BURST_LEN    ( LP_LOG_BURST_LEN        ),
+    .C_ADDR_WIDTH        ( C_M_AXI_GMEM_ADDR_WIDTH ),
+    .C_DATA_WIDTH        ( C_M_AXI_GMEM_DATA_WIDTH ),
+    .C_MAX_LENGTH_WIDTH  ( LP_LENGTH_WIDTH ),
+    .C_BURST_LEN         ( LP_AXI_BURST_LEN ),
+    .C_LOG_BURST_LEN     ( LP_LOG_BURST_LEN ),
     .C_INCLUDE_DATA_FIFO ( 1 )
 )
 inst_axi_write_master (

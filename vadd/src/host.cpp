@@ -4,7 +4,8 @@
 #include <time.h>
 #include "hlslib/xilinx/SDAccel.h"
 
-#define DATA_SIZE 262144
+#define KB 256
+#define DATA_SIZE 100 * 1024 * KB
 
 int main(int argc, char **argv) {
     // Check the arguments and load them

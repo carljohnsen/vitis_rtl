@@ -1,4 +1,4 @@
-TARGET = hw_emu
+TARGET = hw
 NAME = vadd
 RTL_KERNELS = krnl_vadd_rtl
 
