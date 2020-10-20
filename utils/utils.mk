@@ -62,8 +62,7 @@ all: build
 # TODO also remove some of the hidden folders, and find a way to move all this pesky logging...
 clean:
 	rm -rf ./$(BUILD_DIR) ./$(LOG_DIR)
-	rm -f ./hs_err_pid* ./xcd.log ./xrc.log
-	rm -f ./profile_kernels.csv ./timeline_kernels.csv
+	rm -f ./hs_err_pid* ./profile_kernels.csv ./timeline_kernels.csv
 	rm -rf ./.ipcache/ ./.Xil/ ./$(PLATFORM)-* ./.hbs/
 
 build: $(DEVICE_BINARY) $(HOST_BINARY) $(EMCONFIG)
@@ -94,10 +93,14 @@ $(OBJ_DIR)/cpp_%.xo: $(SRC_HLS_DIR)/%.cpp
 $(LINKED_KERNEL): $(RTL_XO_TARGETS) $(CPP_XO_TARGETS)
 	mkdir -p $(OBJ_DIR) $(VITIS_BUILD_DIR)/link $(REPORT_DIR) $(LOG_DIR)
 	$(VPP) $(VPP_FLAGS) $(CONFIG_LINK) --temp_dir $(VITIS_BUILD_DIR)/link -o $@ -l $^
+	mv xcd.log $(LOG_DIR)/xcd_link.log
+	mv xrc.log $(LOG_DIR)/xrc_link.log
 
 $(DEVICE_BINARY): $(LINKED_KERNEL)
 	mkdir -p $(BIN_DIR) $(VITIS_BUILD_DIR)/pack $(REPORT_DIR) $(LOG_DIR)
 	$(VPP) $(VPP_FLAGS) $(CONFIG_PACKAGE) --temp_dir $(VITIS_BUILD_DIR)/pack -o $@ -p $<
+	mv xcd.log $(LOG_DIR)/xcd_pkg.log
+	mv xrc.log $(LOG_DIR)/xrc_pkg.log
 
 $(EMCONFIG):
 	emconfigutil --platform $(PLATFORM) --od $(BIN_DIR)
