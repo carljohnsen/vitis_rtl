@@ -1,4 +1,4 @@
-TARGET = hw_emu
+TARGET = hw
 NAME = vadd_float
 RTL_KERNELS = vadd_float
 

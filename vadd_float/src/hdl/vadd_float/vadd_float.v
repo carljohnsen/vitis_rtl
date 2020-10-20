@@ -177,7 +177,7 @@ inst_example (
   .ap_done         ( ap_done         ),
   .ap_idle         ( ap_idle         ),
   .ap_ready        ( ap_ready        ),
-  .scalar00        ( scalar00        ),
+  .ctrl_xfer_size_in_bytes        ( scalar00        ),
   .axi00_ptr0      ( axi00_ptr0      )
 );
 

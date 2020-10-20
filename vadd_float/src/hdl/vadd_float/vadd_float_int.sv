@@ -35,7 +35,7 @@ module vadd_float_int #(
   output wire                              ap_idle        ,
   output wire                              ap_done        ,
   output wire                              ap_ready       ,
-  input  wire [32-1:0]                     scalar00       ,
+  input  wire [32-1:0]                     ctrl_xfer_size_in_bytes       ,
   input  wire [64-1:0]                     axi00_ptr0
 );
 
@@ -60,7 +60,7 @@ logic                                ap_idle_r                      = 1'b1;
 logic                                ap_start_pulse                ;
 logic [LP_NUM_EXAMPLES-1:0]          ap_done_i                     ;
 logic [LP_NUM_EXAMPLES-1:0]          ap_done_r                      = {LP_NUM_EXAMPLES{1'b0}};
-logic [32-1:0]                       ctrl_xfer_size_in_bytes        = LP_DEFAULT_LENGTH_IN_BYTES;
+//logic [32-1:0]                       ctrl_xfer_size_in_bytes        = LP_DEFAULT_LENGTH_IN_BYTES;
 logic [32-1:0]                       ctrl_constant                  = 32'd1;
 
 ///////////////////////////////////////////////////////////////////////////////

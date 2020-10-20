@@ -4,7 +4,8 @@
 #include <time.h>
 #include "hlslib/xilinx/SDAccel.h"
 
-#define DATA_SIZE 4096
+#define KB 256
+#define DATA_SIZE 100 * 1024 * KB
 
 int main(int argc, char **argv) {
     // Check the arguments and load them
@@ -40,7 +41,7 @@ int main(int argc, char **argv) {
     gmem.CopyFromHost(input_data.begin());
 
     // Create the kernel
-    auto kernel = program.MakeKernel("vadd_float", size, gmem);
+    auto kernel = program.MakeKernel("vadd_float", size*4, gmem);
 
     // Execute kernel
     const auto elapsed = kernel.ExecuteTask();
