@@ -25,6 +25,8 @@ update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1
 set_property top $kernel_name [current_fileset]
 set_property top_file {$src_dir/$kernel_name} [current_fileset]
+set_msg_config -id "HDL" -new_severity "ERROR"
+check_syntax
 ipx::package_project -root_dir $pkg_dir -vendor xilinx.com -library RTLKernel -taxonomy /KernelIP -import_files -set_current false
 ipx::unload_core $pkg_dir/component.xml
 ipx::edit_ip_in_project -upgrade true -name tmp_project -directory $pkg_dir $pkg_dir/component.xml

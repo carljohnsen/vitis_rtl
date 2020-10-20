@@ -9,6 +9,8 @@ set top_file    [lindex $::argv 1]
 set build_dir   [lindex $::argv 2]
 set include_dir [lindex $::argv 3]
 
+set_msg_config -id "HDL" -new_severity "ERROR"
+
 create_project batch_synthesis_test $build_dir/synthesis_test -part xcu250-figd2104-2L-e
 set_property board_part xilinx.com:au250:part0:1.3 [current_project]
 add_files [glob $src_dir/*.v $src_dir/*.sv $include_dir/*.v $include_dir/*.sv]
