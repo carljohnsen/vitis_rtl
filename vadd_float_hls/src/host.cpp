@@ -4,7 +4,7 @@
 #include <time.h>
 #include "hlslib/xilinx/SDAccel.h"
 
-#define DATA_SIZE 4096
+#define DATA_SIZE 256
 
 int main(int argc, char **argv) {
     // Check the arguments and load them
@@ -46,12 +46,14 @@ int main(int argc, char **argv) {
     inb.CopyFromHost(input_b.begin());
 
     // Create the kernels
-    auto kernel_in = program.MakeKernel("reader", ina, inb, size);
+    auto kernel_ina = program.MakeKernel("reader", ina, size);
+    auto kernel_inb = program.MakeKernel("reader", inb, size);
     auto kernel_vadd = program.MakeKernel("vadd_float");
     auto kernel_out = program.MakeKernel("writer", out);
 
     // Execute kernels
-    const auto kin = kernel_in.ExecuteTaskFork();
+    const auto kia = kernel_ina.ExecuteTaskFork();
+    const auto kib = kernel_inb.ExecuteTaskFork();
     const auto kad = kernel_vadd.ExecuteTaskFork();
     const auto kou = kernel_out.ExecuteTaskFork();
 
