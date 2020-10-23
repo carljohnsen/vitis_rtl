@@ -25,6 +25,8 @@ update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1
 set_property top $kernel_name [current_fileset]
 set_property top_file {$src_dir/$kernel_name} [current_fileset]
+set_msg_config -id "HDL" -new_severity "ERROR"
+check_syntax
 ipx::package_project -root_dir $pkg_dir -vendor xilinx.com -library RTLKernel -taxonomy /KernelIP -import_files -set_current false
 ipx::unload_core $pkg_dir/component.xml
 ipx::edit_ip_in_project -upgrade true -name tmp_project -directory $pkg_dir $pkg_dir/component.xml
@@ -35,7 +37,7 @@ set_property core_revision 2 $core
 foreach up [ipx::get_user_parameters] {
     ipx::remove_user_parameter [get_property NAME $up] $core
 }
-ipx::associate_bus_interfaces -busif m00_axi -clock ap_clk $core
+ipx::associate_bus_interfaces -busif m_axi_gmem -clock ap_clk $core
 ipx::associate_bus_interfaces -busif s_axi_control -clock ap_clk $core
 
 # Specify the freq_hz
@@ -121,7 +123,7 @@ set reg [::ipx::add_register -quiet "gmem_ptr" $addr_block]
     set_property address_offset 0x018                                     $reg
     set_property size           [expr {8*8}]                              $reg
     set regparam [::ipx::add_register_parameter -quiet {ASSOCIATED_BUSIF} $reg]
-    set_property value          m00_axi                                $regparam
+    set_property value          m_axi_gmem                                $regparam
 
 set_property slave_memory_map_ref "s_axi_control" [::ipx::get_bus_interfaces -of $core "s_axi_control"]
 

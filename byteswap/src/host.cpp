@@ -5,8 +5,9 @@
 #include <time.h>
 #include "hlslib/xilinx/SDAccel.h"
 
-// 1 MB
-#define DATA_SIZE 16384 * 16
+#define KB 256
+#define DATA_SIZE 100 * 1024 * KB
+//#define DATA_SIZE 16 * KB
 
 int main(int argc, char **argv) {
     // Check the arguments and load them
@@ -19,7 +20,6 @@ int main(int argc, char **argv) {
     // Allocate host memory and input data
     srand(time(NULL));
     const int size = DATA_SIZE;
-    const int size_bytes = size * sizeof(int);
     std::vector<int> input_data(size), expected_result(size), result(size);
     for (int i = 0; i < size; i++) {
         // Input data
@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
     gmem.CopyFromHost(input_data.begin());
 
     // Create the kernel
-    auto kernel = program.MakeKernel("byteswap", size_bytes, gmem);
+    auto kernel = program.MakeKernel("byteswap", size, gmem);
 
     // Execute kernel
     const auto elapsed = kernel.ExecuteTask();
@@ -60,8 +60,9 @@ int main(int argc, char **argv) {
         if (expected_result[i] != result[i]) {
             printf("Error %d: result %08x != expected %08x\n",
                     i, result[i], expected_result[i]);
-            match = 1;
-            break;
+            match++;
+            if (match == 32)
+                break;
         }
     }
 

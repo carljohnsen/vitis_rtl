@@ -113,7 +113,7 @@ logic                                                         arxfer;
 logic                                                         arvalid_r = 1'b0;
 logic [C_NUM_CHANNELS-1:0][C_ADDR_WIDTH-1:0]                  addr;
 // TODO this needs to be reset as the maximum value
-logic [C_ID_WIDTH-1:0]                                        id = {C_ID_WIDTH{1'b1}};
+logic [C_ID_WIDTH-1:0]                                        id = {C_ID_WIDTH{C_NUM_CHANNELS-1}};
 logic [LP_TRANSACTION_CNTR_WIDTH-1:0]                         ar_transactions_to_go;
 logic                                                         ar_final_transaction;
 logic [C_NUM_CHANNELS-1:0]                                    incr_ar_to_r_cnt;
@@ -193,10 +193,10 @@ end
 always @(posedge aclk) begin
   if (start) begin
       // TODO this needs to be reset to maximum id
-    id <= {C_ID_WIDTH{1'b1}};
+    id <= {C_ID_WIDTH{C_NUM_CHANNELS-1}};
   end
   else begin
-    id <= arxfer ? (id - 1'b1) % C_NUM_CHANNELS : id;
+    id <= arxfer ? (id - 1'b1) % {C_ID_WIDTH{C_NUM_CHANNELS}} : id;
   end
 end
 
@@ -260,46 +260,49 @@ inst_ar_to_r_transaction_cntr[C_NUM_CHANNELS-1:0] (
 
 generate
 if (C_INCLUDE_DATA_FIFO == 1) begin : gen_fifo
-    xpm_fifo_sync # (
-        .FIFO_MEMORY_TYPE    ( "auto" ),                     // string; "auto", "block", "distributed", or "ultra";
-        .ECC_MODE            ( "no_ecc" ),                   // string; "no_ecc" or "en_ecc";
-        .FIFO_WRITE_DEPTH    ( LP_FIFO_DEPTH ),           // positive integer
-        .WRITE_DATA_WIDTH    ( C_DATA_WIDTH ),    // positive integer
-        .WR_DATA_COUNT_WIDTH ( $clog2(LP_FIFO_DEPTH)+1 ), // positive integer, Not used
-        .PROG_FULL_THRESH    ( C_BURST_LEN-2 ),         // positive integer
-        .FULL_RESET_VALUE    ( 1 ),                          // positive integer; 0 or 1
-        .READ_MODE           ( "fwft" ),                     // string; "std" or "fwft";
-        .FIFO_READ_LATENCY   ( 1 ),                          // positive integer;
-        .READ_DATA_WIDTH     ( C_DATA_WIDTH ),    // positive integer
-        .RD_DATA_COUNT_WIDTH ( $clog2(LP_FIFO_DEPTH)+1 ), // positive integer, not used
-        .PROG_EMPTY_THRESH   ( 10 ),                         // positive integer, not used
-        .DOUT_RESET_VALUE    ( "0" ),                        // string, don't care
-        .WAKEUP_TIME         ( 0 )                           // positive integer; 0 or 2;
-    ) inst_rd_xpm_fifo_sync[C_NUM_CHANNELS-1:0] (
-        .sleep         ( 1'b0 ),
-        .rst           ( areset ),
-        .wr_clk        ( aclk ),
-        .wr_en         ( tvalid ),
-        .din           ( tdata ),
-        .full          ( ),
-        .prog_full     ( prog_full ),
-        .wr_data_count ( ),
-        .overflow      ( ),
-        .wr_rst_busy   ( ),
-        .rd_en         ( m_tready ),
-        .dout          ( m_tdata ),
-        .empty         ( m_tvalid_n ),
-        .prog_empty    ( ),
-        .rd_data_count ( ),
-        .underflow     ( ),
-        .rd_rst_busy   ( ),
-        .injectsbiterr ( 1'b0 ),
-        .injectdbiterr ( 1'b0 ),
-        .sbiterr       ( ),
-        .dbiterr       ( )
-    );
-    // rready can remain high for optimal timing because ar transactions are
-    // not issued unless there is enough space in the FIFO.
+    genvar i;
+    for (i = 0; i < C_NUM_CHANNELS; i = i+1) begin
+        xpm_fifo_sync # (
+            .FIFO_MEMORY_TYPE    ( "auto" ),                     // string; "auto", "block", "distributed", or "ultra";
+            .ECC_MODE            ( "no_ecc" ),                   // string; "no_ecc" or "en_ecc";
+            .FIFO_WRITE_DEPTH    ( LP_FIFO_DEPTH ),           // positive integer
+            .WRITE_DATA_WIDTH    ( C_DATA_WIDTH ),    // positive integer
+            .WR_DATA_COUNT_WIDTH ( $clog2(LP_FIFO_DEPTH)+1 ), // positive integer, Not used
+            .PROG_FULL_THRESH    ( C_BURST_LEN-2 ),         // positive integer
+            .FULL_RESET_VALUE    ( 1 ),                          // positive integer; 0 or 1
+            .READ_MODE           ( "fwft" ),                     // string; "std" or "fwft";
+            .FIFO_READ_LATENCY   ( 1 ),                          // positive integer;
+            .READ_DATA_WIDTH     ( C_DATA_WIDTH ),    // positive integer
+            .RD_DATA_COUNT_WIDTH ( $clog2(LP_FIFO_DEPTH)+1 ), // positive integer, not used
+            .PROG_EMPTY_THRESH   ( 10 ),                         // positive integer, not used
+            .DOUT_RESET_VALUE    ( "0" ),                        // string, don't care
+            .WAKEUP_TIME         ( 0 )                           // positive integer; 0 or 2;
+        ) inst_rd_xpm_fifo_sync(
+            .sleep         ( 1'b0 ),
+            .rst           ( areset ),
+            .wr_clk        ( aclk ),
+            .wr_en         ( tvalid[i] ),
+            .din           ( tdata[i] ),
+            .full          ( ),
+            .prog_full     ( prog_full[i] ),
+            .wr_data_count ( ),
+            .overflow      ( ),
+            .wr_rst_busy   ( ),
+            .rd_en         ( m_tready[i] ),
+            .dout          ( m_tdata[i] ),
+            .empty         ( m_tvalid_n[i] ),
+            .prog_empty    ( ),
+            .rd_data_count ( ),
+            .underflow     ( ),
+            .rd_rst_busy   ( ),
+            .injectsbiterr ( 1'b0 ),
+            .injectdbiterr ( 1'b0 ),
+            .sbiterr       ( ),
+            .dbiterr       ( )
+        );
+        // rready can remain high for optimal timing because ar transactions are
+        // not issued unless there is enough space in the FIFO.
+    end
     assign rready = 1'b1;
     assign m_tvalid = ~m_tvalid_n;
 end else begin

@@ -1,4 +1,4 @@
-TARGET = hw_emu
+TARGET = hw
 NAME = byteswap
 RTL_KERNELS = byteswap
 
