@@ -19,7 +19,7 @@ module byteswap_int #(
     output wire                               ap_idle,
     output wire                               ap_done,
     output wire                               ap_ready,
-    input  wire [C_XFER_SIZE_WIDTH-1:0]       xfer_size_bytes,
+    input  wire [C_XFER_SIZE_WIDTH-1:0]       xfer_size,
     input  wire [C_M_AXI_GMEM_ADDR_WIDTH-1:0] gmem_ptr,
 
     // AXI4 master interface
@@ -187,7 +187,7 @@ inst_axi_read_master (
     .ctrl_start  ( ap_start_pulse ),
     .ctrl_done   ( read_done ),
     .ctrl_offset ( gmem_ptr ),
-    .ctrl_length ( xfer_size_bytes ),
+    .ctrl_length ( xfer_size ),
 
     .arvalid ( m_axi_gmem_ARVALID ),
     .arready ( m_axi_gmem_ARREADY ),
@@ -246,7 +246,7 @@ inst_axi_write_master (
 
     .ctrl_start  ( ap_start_pulse ),
     .ctrl_offset ( gmem_ptr ),
-    .ctrl_length ( xfer_size_bytes ),
+    .ctrl_length ( xfer_size ),
     .ctrl_done   ( write_done ),
 
     .awvalid     ( m_axi_gmem_AWVALID ),

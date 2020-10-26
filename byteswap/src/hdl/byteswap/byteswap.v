@@ -88,7 +88,7 @@ wire ap_start;
 wire ap_idle;
 wire ap_done;
 wire ap_ready;
-wire [32-1:0] xfer_size_bytes;
+wire [32-1:0] xfer_size;
 wire [64-1:0] gmem_ptr;
 
 // Register and invert reset signal.
@@ -102,33 +102,33 @@ byteswap_control_s_axi #(
     .C_S_AXI_DATA_WIDTH ( C_S_AXI_CONTROL_DATA_WIDTH )
 )
 inst_control_slave (
-    .ACLK            ( ap_clk ),
-    .ARESET          ( areset ),
-    .ACLK_EN         ( 1'b1 ),
-    .interrupt       ( interrupt ),
-    .ap_start        ( ap_start ),
-    .ap_done         ( ap_done ),
-    .ap_ready        ( ap_ready ),
-    .ap_idle         ( ap_idle ),
-    .xfer_size_bytes ( xfer_size_bytes ),
-    .gmem_ptr        ( gmem_ptr ),
-    .AWVALID         ( s_axi_control_awvalid ),
-    .AWREADY         ( s_axi_control_awready ),
-    .AWADDR          ( s_axi_control_awaddr ),
-    .WVALID          ( s_axi_control_wvalid ),
-    .WREADY          ( s_axi_control_wready ),
-    .WDATA           ( s_axi_control_wdata ),
-    .WSTRB           ( s_axi_control_wstrb ),
-    .ARVALID         ( s_axi_control_arvalid ),
-    .ARREADY         ( s_axi_control_arready ),
-    .ARADDR          ( s_axi_control_araddr ),
-    .RVALID          ( s_axi_control_rvalid ),
-    .RREADY          ( s_axi_control_rready ),
-    .RDATA           ( s_axi_control_rdata ),
-    .RRESP           ( s_axi_control_rresp ),
-    .BVALID          ( s_axi_control_bvalid ),
-    .BREADY          ( s_axi_control_bready ),
-    .BRESP           ( s_axi_control_bresp )
+    .ACLK      ( ap_clk ),
+    .ARESET    ( areset ),
+    .ACLK_EN   ( 1'b1 ),
+    .interrupt ( interrupt ),
+    .ap_start  ( ap_start ),
+    .ap_done   ( ap_done ),
+    .ap_ready  ( ap_ready ),
+    .ap_idle   ( ap_idle ),
+    .xfer_size ( xfer_size ),
+    .gmem_ptr  ( gmem_ptr ),
+    .AWVALID   ( s_axi_control_awvalid ),
+    .AWREADY   ( s_axi_control_awready ),
+    .AWADDR    ( s_axi_control_awaddr ),
+    .WVALID    ( s_axi_control_wvalid ),
+    .WREADY    ( s_axi_control_wready ),
+    .WDATA     ( s_axi_control_wdata ),
+    .WSTRB     ( s_axi_control_wstrb ),
+    .ARVALID   ( s_axi_control_arvalid ),
+    .ARREADY   ( s_axi_control_arready ),
+    .ARADDR    ( s_axi_control_araddr ),
+    .RVALID    ( s_axi_control_rvalid ),
+    .RREADY    ( s_axi_control_rready ),
+    .RDATA     ( s_axi_control_rdata ),
+    .RRESP     ( s_axi_control_rresp ),
+    .BVALID    ( s_axi_control_bvalid ),
+    .BREADY    ( s_axi_control_bready ),
+    .BRESP     ( s_axi_control_bresp )
 );
 
 // Controller
@@ -185,12 +185,12 @@ inst_byteswap (
     .m_axi_gmem_BRESP      ( m_axi_gmem_BRESP ),
     .m_axi_gmem_BID        ( m_axi_gmem_BID ),
 
-    .ap_start        ( ap_start ),
-    .ap_done         ( ap_done ),
-    .ap_idle         ( ap_idle ),
-    .ap_ready        ( ap_ready ),
-    .xfer_size_bytes ( xfer_size_bytes ),
-    .gmem_ptr        ( gmem_ptr )
+    .ap_start  ( ap_start ),
+    .ap_done   ( ap_done ),
+    .ap_idle   ( ap_idle ),
+    .ap_ready  ( ap_ready ),
+    .xfer_size ( xfer_size ),
+    .gmem_ptr  ( gmem_ptr )
 );
 
 endmodule

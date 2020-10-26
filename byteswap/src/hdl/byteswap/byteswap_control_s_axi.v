@@ -34,7 +34,7 @@ module byteswap_control_s_axi
     input  wire                            ap_done,
     input  wire                            ap_ready,
     input  wire                            ap_idle,
-    output wire [31:0]                     xfer_size_bytes,
+    output wire [31:0]                     xfer_size,
     output wire [63:0]                     gmem_ptr
 );
 //------------------------Address Info-------------------
@@ -56,8 +56,8 @@ module byteswap_control_s_axi
 //        bit 0  - Channel 0 (ap_done)
 //        bit 1  - Channel 1 (ap_ready)
 //        others - reserved
-// 0x10 : Data signal of xfer_size_bytes
-//        bit 31~0 - xfer_size_bytes[31:0] (Read/Write)
+// 0x10 : Data signal of xfer_size
+//        bit 31~0 - xfer_size[31:0] (Read/Write)
 // 0x14 : reserved
 // 0x18 : Data signal of gmem_ptr
 //        bit 31~0 - gmem_ptr[31:0] (Read/Write)
@@ -69,47 +69,47 @@ module byteswap_control_s_axi
 
 //------------------------Parameter----------------------
 localparam
-    ADDR_AP_CTRL                 = 6'h00,
-    ADDR_GIE                     = 6'h04,
-    ADDR_IER                     = 6'h08,
-    ADDR_ISR                     = 6'h0c,
-    ADDR_XFER_SIZE_BYTES_DATA_0  = 6'h10,
-    ADDR_XFER_SIZE_BYTES_CTRL    = 6'h14,
-    ADDR_GMEM_PTR_DATA_0         = 6'h18,
-    ADDR_GMEM_PTR_DATA_1         = 6'h1c,
-    ADDR_GMEM_PTR_CTRL           = 6'h20,
-    WRIDLE                       = 2'd0,
-    WRDATA                       = 2'd1,
-    WRRESP                       = 2'd2,
-    WRRESET                      = 2'd3,
-    RDIDLE                       = 2'd0,
-    RDDATA                       = 2'd1,
-    RDRESET                      = 2'd2,
-    ADDR_BITS                    = 6;
+    ADDR_AP_CTRL           = 6'h00,
+    ADDR_GIE               = 6'h04,
+    ADDR_IER               = 6'h08,
+    ADDR_ISR               = 6'h0c,
+    ADDR_XFER_SIZE_DATA_0  = 6'h10,
+    ADDR_XFER_SIZE_CTRL    = 6'h14,
+    ADDR_GMEM_PTR_DATA_0   = 6'h18,
+    ADDR_GMEM_PTR_DATA_1   = 6'h1c,
+    ADDR_GMEM_PTR_CTRL     = 6'h20,
+    WRIDLE                 = 2'd0,
+    WRDATA                 = 2'd1,
+    WRRESP                 = 2'd2,
+    WRRESET                = 2'd3,
+    RDIDLE                 = 2'd0,
+    RDDATA                 = 2'd1,
+    RDRESET                = 2'd2,
+    ADDR_BITS              = 6;
 
 //------------------------Local signal-------------------
-    reg  [1:0]                    wstate = WRRESET;
-    reg  [1:0]                    wnext;
-    reg  [ADDR_BITS-1:0]          waddr;
-    wire [31:0]                   wmask;
-    wire                          aw_hs;
-    wire                          w_hs;
-    reg  [1:0]                    rstate = RDRESET;
-    reg  [1:0]                    rnext;
-    reg  [31:0]                   rdata;
-    wire                          ar_hs;
-    wire [ADDR_BITS-1:0]          raddr;
+    reg  [1:0]             wstate = WRRESET;
+    reg  [1:0]             wnext;
+    reg  [ADDR_BITS-1:0]   waddr;
+    wire [31:0]            wmask;
+    wire                   aw_hs;
+    wire                   w_hs;
+    reg  [1:0]             rstate = RDRESET;
+    reg  [1:0]             rnext;
+    reg  [31:0]            rdata;
+    wire                   ar_hs;
+    wire [ADDR_BITS-1:0]   raddr;
     // internal registers
-    reg                           int_ap_idle;
-    reg                           int_ap_ready;
-    reg                           int_ap_done = 1'b0;
-    reg                           int_ap_start = 1'b0;
-    reg                           int_auto_restart = 1'b0;
-    reg                           int_gie = 1'b0;
-    reg  [1:0]                    int_ier = 2'b0;
-    reg  [1:0]                    int_isr = 2'b0;
-    reg  [31:0]                   int_xfer_size_bytes = 'b0;
-    reg  [63:0]                   int_gmem_ptr = 'b0;
+    reg                    int_ap_idle;
+    reg                    int_ap_ready;
+    reg                    int_ap_done = 1'b0;
+    reg                    int_ap_start = 1'b0;
+    reg                    int_auto_restart = 1'b0;
+    reg                    int_gie = 1'b0;
+    reg  [1:0]             int_ier = 2'b0;
+    reg  [1:0]             int_isr = 2'b0;
+    reg  [31:0]            int_xfer_size = 'b0;
+    reg  [63:0]            int_gmem_ptr = 'b0;
 
 //------------------------Instantiation------------------
 
@@ -217,8 +217,8 @@ always @(posedge ACLK) begin
                 ADDR_ISR: begin
                     rdata <= int_isr;
                 end
-                ADDR_XFER_SIZE_BYTES_DATA_0: begin
-                    rdata <= int_xfer_size_bytes[31:0];
+                ADDR_XFER_SIZE_DATA_0: begin
+                    rdata <= int_xfer_size[31:0];
                 end
                 ADDR_GMEM_PTR_DATA_0: begin
                     rdata <= int_gmem_ptr[31:0];
@@ -233,10 +233,10 @@ end
 
 
 //------------------------Register logic-----------------
-assign interrupt  = int_gie & (|int_isr);
-assign ap_start   = int_ap_start;
-assign xfer_size_bytes   = int_xfer_size_bytes;
-assign gmem_ptr = int_gmem_ptr;
+assign interrupt = int_gie & (|int_isr);
+assign ap_start  = int_ap_start;
+assign xfer_size = int_xfer_size;
+assign gmem_ptr  = int_gmem_ptr;
 // int_ap_start
 always @(posedge ACLK) begin
     if (ARESET)
@@ -333,14 +333,14 @@ always @(posedge ACLK) begin
     end
 end
 
-// int_xfer_size_bytes[31:0]
+// int_xfer_size[31:0]
 always @(posedge ACLK) begin
     if (ARESET)
-        int_xfer_size_bytes[31:0] <= 0;
+        int_xfer_size[31:0] <= 0;
     else if (ACLK_EN) begin
-        if (w_hs && waddr == ADDR_XFER_SIZE_BYTES_DATA_0)
-            int_xfer_size_bytes[31:0] <=
-                (WDATA[31:0] & wmask) | (int_xfer_size_bytes[31:0] & ~wmask);
+        if (w_hs && waddr == ADDR_XFER_SIZE_DATA_0)
+            int_xfer_size[31:0] <=
+                (WDATA[31:0] & wmask) | (int_xfer_size[31:0] & ~wmask);
     end
 end
 
