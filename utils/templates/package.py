@@ -204,7 +204,7 @@ if __name__ == '__main__':
     memory_ptrs = ''
     for name, bus_name in config['params']['memory'].items():
         memory_ptrs += memory_ptr_reg(name, addr, bus_name)
-        addr += size//8 + 4
+        addr += 8 + 4
 
     script_str = package_script(bus_clks, ip_cores, scalars, memory_ptrs)
 

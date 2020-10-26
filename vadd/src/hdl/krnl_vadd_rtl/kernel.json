@@ -1,0 +1,18 @@
+{
+    "name" : "krnl_vadd_rtl",
+    "buses" : [
+        "m_axi_gmem"
+    ],
+    "params" : {
+        "scalars" : {
+            "length_r" : 32
+        },
+        "memory" : {
+            "a" : "m_axi_gmem",
+            "b" : "m_axi_gmem",
+            "c" : "m_axi_gmem"
+        }
+    },
+    "ip_cores" : {
+    }
+}

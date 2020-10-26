@@ -209,7 +209,7 @@ end
 assign ap_ready = ap_done;
 
 // AXI4-Lite slave
-krnl_vadd_rtl_control_s_axi #(
+krnl_vadd_rtl_control #(
     .C_S_AXI_ADDR_WIDTH( C_S_AXI_CONTROL_ADDR_WIDTH ),
     .C_S_AXI_DATA_WIDTH( C_S_AXI_CONTROL_DATA_WIDTH )
 )
@@ -265,7 +265,6 @@ inst_axi_read_master (
     .ctrl_done      ( read_done ),
     .ctrl_offset    ( {b,a} ),
     .ctrl_length    ( length_r ),
-    //.ctrl_prog_full ( ctrl_rd_fifo_prog_full ),
 
     .arvalid        ( m_axi_gmem_ARVALID ),
     .arready        ( m_axi_gmem_ARREADY ),

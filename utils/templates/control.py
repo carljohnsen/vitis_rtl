@@ -12,7 +12,7 @@ def addr_info(addr, bits, name):
     return tmp
 
 def port(bits, name):
-    return f'output wire [{bits}:0] {name},'
+    return f'    output wire [{bits}:0] {name},\n'
 
 def localparam_addr(addr_width, bits, addr, name):
     tmp = ''
@@ -60,7 +60,7 @@ module {name}_control
     C_S_AXI_ADDR_WIDTH = 6,
     C_S_AXI_DATA_WIDTH = 32
 )(
-    {ports}
+{ports}
     input  wire                            ACLK,
     input  wire                            ARESET,
     input  wire                            ACLK_EN,
@@ -112,41 +112,42 @@ module {name}_control
 
 //------------------------Parameter----------------------
 localparam
-    ADDR_AP_CTRL           = 6'h00,
-    ADDR_GIE               = 6'h04,
-    ADDR_IER               = 6'h08,
-    ADDR_ISR               = 6'h0c,
+    ADDR_AP_CTRL = 6'h00,
+    ADDR_GIE     = 6'h04,
+    ADDR_IER     = 6'h08,
+    ADDR_ISR     = 6'h0c,
 {localparam_addrs}
-    WRIDLE                 = 2'd0,
-    WRDATA                 = 2'd1,
-    WRRESP                 = 2'd2,
-    WRRESET                = 2'd3,
-    RDIDLE                 = 2'd0,
-    RDDATA                 = 2'd1,
-    RDRESET                = 2'd2,
-    ADDR_BITS              = 6;
+    WRIDLE    = 2'd0,
+    WRDATA    = 2'd1,
+    WRRESP    = 2'd2,
+    WRRESET   = 2'd3,
+    RDIDLE    = 2'd0,
+    RDDATA    = 2'd1,
+    RDRESET   = 2'd2,
+    ADDR_BITS = C_S_AXI_ADDR_WIDTH;
 
 //------------------------Local signal-------------------
-reg  [1:0]             wstate = WRRESET;
-reg  [1:0]             wnext;
-reg  [ADDR_BITS-1:0]   waddr;
-wire [31:0]            wmask;
-wire                   aw_hs;
-wire                   w_hs;
-reg  [1:0]             rstate = RDRESET;
-reg  [1:0]             rnext;
-reg  [31:0]            rdata;
-wire                   ar_hs;
-wire [ADDR_BITS-1:0]   raddr;
+reg  [1:0]           wstate = WRRESET;
+reg  [1:0]           wnext;
+reg  [ADDR_BITS-1:0] waddr;
+wire [31:0]          wmask;
+wire                 aw_hs;
+wire                 w_hs;
+reg  [1:0]           rstate = RDRESET;
+reg  [1:0]           rnext;
+reg  [31:0]          rdata;
+wire                 ar_hs;
+wire [ADDR_BITS-1:0] raddr;
+
 // internal registers
-reg                    int_ap_idle;
-reg                    int_ap_ready;
-reg                    int_ap_done = 1'b0;
-reg                    int_ap_start = 1'b0;
-reg                    int_auto_restart = 1'b0;
-reg                    int_gie = 1'b0;
-reg  [1:0]             int_ier = 2'b0;
-reg  [1:0]             int_isr = 2'b0;
+reg       int_ap_idle;
+reg       int_ap_ready;
+reg       int_ap_done = 1'b0;
+reg       int_ap_start = 1'b0;
+reg       int_auto_restart = 1'b0;
+reg       int_gie = 1'b0;
+reg [1:0] int_ier = 2'b0;
+reg [1:0] int_isr = 2'b0;
 {internal_regs}
 
 //------------------------Instantiation------------------

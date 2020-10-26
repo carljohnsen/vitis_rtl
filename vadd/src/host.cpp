@@ -5,7 +5,8 @@
 #include "hlslib/xilinx/SDAccel.h"
 
 #define KB 256
-#define DATA_SIZE 100 * 1024 * KB
+//#define DATA_SIZE 100 * 1024 * KB
+#define DATA_SIZE 16 * KB
 
 int main(int argc, char **argv) {
     // Check the arguments and load them
@@ -47,7 +48,7 @@ int main(int argc, char **argv) {
     buffer_input2.CopyFromHost(input_data2.begin());
 
     // Create the kernel
-    auto kernel = program.MakeKernel("krnl_vadd_rtl", buffer_input1, buffer_input2, buffer_result, size);
+    auto kernel = program.MakeKernel("krnl_vadd_rtl", size, buffer_input1, buffer_input2, buffer_result);
 
     // Execute kernel
     const auto elapsed = kernel.ExecuteTask();
