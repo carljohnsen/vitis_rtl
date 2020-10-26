@@ -82,17 +82,17 @@ pack: $(KERNEL_CONTROLS) $(TCL_PACKAGES) $(RTL_XO_TARGETS)
 
 $(TCL_SYNTHS): $(SCRIPT_DIR)/%_synth.tcl: $(SYNTH_TEMPLATE) $(SRC_HDL_DIR)/%/kernel.json
 	mkdir -p $(SCRIPT_DIR)
-	python3 $(SYNTH_TEMPLATE) $(KERNEL_CONFIG) -o $@ -f
+	python3 $^ -o $@ -f
 
-elaborate_%: $(SCRIPT_DIR)/%_synth.tcl $(SRC_HDL_DIR)/%/*.*v
+elaborate_%: $(SCRIPT_DIR)/%_synth.tcl $(GENERATED_DIR)/%_control.v $(SRC_HDL_DIR)/%/*.*v
 	rm -rf $(VIVADO_ELABORATE_DIR)
 	mkdir -p $(VIVADO_ELABORATE_DIR) $(LOG_DIR)
-	$(VIVADO) $(VIVADO_FLAGS) -source $(TCL_SYNTH) -tclargs $(SRC_HDL_DIR)/$(*F) $(*F) $(VIVADO_ELABORATE_DIR) $(RTLLIB_DIR) -rtl
+	$(VIVADO) $(VIVADO_FLAGS) -source $< -tclargs $(SRC_HDL_DIR)/$(*F) $(*F) $(VIVADO_ELABORATE_DIR) $(RTLLIB_DIR) $(GENERATED_DIR) -rtl
 
-synth_%: $(SCRIPT_DIR)/%_synth.tcl $(SRC_HDL_DIR)/%/*.*v
+synth_%: $(SCRIPT_DIR)/%_synth.tcl $(GENERATED_DIR)/%_control.v $(SRC_HDL_DIR)/%/*.*v
 	rm -rf $(VIVADO_SYNTH_DIR)
 	mkdir -p $(VIVADO_SYNTH_DIR) $(LOG_DIR)
-	$(VIVADO) $(VIVADO_FLAGS) -source $(TCL_SYNTH) -tclargs $(SRC_HDL_DIR)/$(*F) $(*F) $(VIVADO_SYNTH_DIR) $(RTLLIB_DIR)
+	$(VIVADO) $(VIVADO_FLAGS) -source $< -tclargs $(SRC_HDL_DIR)/$(*F) $(*F) $(VIVADO_SYNTH_DIR) $(RTLLIB_DIR) $(GENERATED_DIR)
 
 $(KERNEL_CONTROLS): $(GENERATED_DIR)/%_control.v: $(CONTROL_TEMPLATE) $(SRC_HDL_DIR)/%/kernel.json
 	mkdir -p $(GENERATED_DIR)
