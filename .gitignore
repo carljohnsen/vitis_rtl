@@ -10,3 +10,4 @@
 *.swp
 */.Xil
 */package_kernel.tcl
+*/src/hdl/*/*_control.v

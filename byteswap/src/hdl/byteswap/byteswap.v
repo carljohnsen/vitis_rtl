@@ -97,7 +97,7 @@ always @(posedge ap_clk) begin
 end
 
 // Control interface slave
-byteswap_control_s_axi #(
+byteswap_control #(
     .C_S_AXI_ADDR_WIDTH ( C_S_AXI_CONTROL_ADDR_WIDTH ),
     .C_S_AXI_DATA_WIDTH ( C_S_AXI_CONTROL_DATA_WIDTH )
 )

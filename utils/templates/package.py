@@ -2,7 +2,7 @@ import argparse
 import json
 import os
 
-# TODO nogle af parametrene skal vel være unikke for hver?
+# TODO nogle af parametrene skal vel være unikke for hver? Så multi kernels!
 def scalar_reg(param_name, addr, num_bytes):
     return '''
 set reg [::ipx::add_register -quiet "{param_name}" $addr_block]

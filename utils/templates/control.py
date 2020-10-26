@@ -1,14 +1,66 @@
-// ==============================================================
-// Vivado(TM) HLS
-// High-Level Synthesis from C, C++ and SystemC v2020.1 (64-bit)
-// Copyright 1986-2020 Xilinx, Inc. All Rights Reserved.
-// ==============================================================
+import argparse
+import json
+import os
+
+
+def addr_info(addr, bits, name):
+    tmp = ''
+    for i in range(bits//32):
+        tmp += f'// 0x{addr+(i*4):02x} : Data signal of {name}\n'
+        tmp += f'//        bit 31~0 - {name}[{((i+1)*32)-1}:{i*32}] (Read/Write)\n'
+    tmp += f'// 0x{addr+bits//8:02x} : reserved\n'
+    return tmp
+
+def port(bits, name):
+    return f'output wire [{bits}:0] {name},'
+
+def localparam_addr(addr_width, bits, addr, name):
+    tmp = ''
+    for i in range(bits//32):
+        tmp += f'ADDR_{name.upper()}_DATA_{i} = {addr_width}\'h{addr+(i*4):x},\n'
+    tmp += f'ADDR_{name.upper()}_CTRL   = {addr_width}\'h{addr+bits//8:x},\n'
+    return tmp
+
+def internal_reg(bits, name):
+    return f'reg [{bits-1}:0] int_{name} = \'b0;\n'
+
+def rdata(bits, name):
+    tmp = ''
+    for i in range(bits//32):
+        tmp += f'                ADDR_{name.upper()}_DATA_{i}: begin\n'
+        tmp += f'                    rdata <= int_{name}[{((i+1)*32)-1}:{i*32}];\n'
+        tmp += f'                end\n'
+    return tmp
+
+def wdata(bits, name):
+    tmp = ''
+    for i in range(bits//32):
+        tmp += f'// int_{name}[{((i+1)*32)-1}:{i*32}]\n'
+        tmp += f'always @(posedge ACLK) begin\n'
+        tmp += f'    if (ARESET)\n'
+        tmp += f'        int_{name}[{((i+1)*32)-1}:{i*32}] <= 0;\n'
+        tmp += f'    else if (ACLK_EN) begin\n'
+        tmp += f'        if (w_hs && waddr == ADDR_{name.upper()}_DATA_{i})\n'
+        tmp += f'            int_{name}[{((i+1)*32)-1}:{i*32}] <=\n'
+        tmp += f'                (WDATA[31:0] & wmask) | (int_{name}[{((i+1)*32)-1}:{i*32}] & ~wmask);\n'
+        tmp += f'    end\n'
+        tmp += f'end\n'
+        tmp += f'\n'
+    return tmp
+
+def reg_assign(name):
+    return f'assign {name} = int_{name};\n'
+
+# TODO C_S_AXI_ADDR_WIDTH
+def control_module(name, ports, addr_infos, localparam_addrs, internal_regs, rdatas, wdatas, reg_assigns):
+    return '''
 `timescale 1ns/1ps
-module byteswap_control_s_axi
+module {name}_control
 #(parameter
     C_S_AXI_ADDR_WIDTH = 6,
     C_S_AXI_DATA_WIDTH = 32
 )(
+    {ports}
     input  wire                            ACLK,
     input  wire                            ARESET,
     input  wire                            ACLK_EN,
@@ -33,9 +85,7 @@ module byteswap_control_s_axi
     output wire                            ap_start,
     input  wire                            ap_done,
     input  wire                            ap_ready,
-    input  wire                            ap_idle,
-    output wire [31:0]                     xfer_size,
-    output wire [63:0]                     gmem_ptr
+    input  wire                            ap_idle
 );
 //------------------------Address Info-------------------
 // 0x00 : Control signals
@@ -56,14 +106,7 @@ module byteswap_control_s_axi
 //        bit 0  - Channel 0 (ap_done)
 //        bit 1  - Channel 1 (ap_ready)
 //        others - reserved
-// 0x10 : Data signal of xfer_size
-//        bit 31~0 - xfer_size[31:0] (Read/Write)
-// 0x14 : reserved
-// 0x18 : Data signal of gmem_ptr
-//        bit 31~0 - gmem_ptr[31:0] (Read/Write)
-// 0x1c : Data signal of gmem_ptr
-//        bit 31~0 - gmem_ptr[63:32] (Read/Write)
-// 0x20 : reserved
+{addr_infos}
 // (SC = Self Clear, COR = Clear on Read,
 //  TOW = Toggle on Write, COH = Clear on Handshake)
 
@@ -73,11 +116,7 @@ localparam
     ADDR_GIE               = 6'h04,
     ADDR_IER               = 6'h08,
     ADDR_ISR               = 6'h0c,
-    ADDR_XFER_SIZE_DATA_0  = 6'h10,
-    ADDR_XFER_SIZE_CTRL    = 6'h14,
-    ADDR_GMEM_PTR_DATA_0   = 6'h18,
-    ADDR_GMEM_PTR_DATA_1   = 6'h1c,
-    ADDR_GMEM_PTR_CTRL     = 6'h20,
+{localparam_addrs}
     WRIDLE                 = 2'd0,
     WRDATA                 = 2'd1,
     WRRESP                 = 2'd2,
@@ -108,8 +147,7 @@ localparam
     reg                    int_gie = 1'b0;
     reg  [1:0]             int_ier = 2'b0;
     reg  [1:0]             int_isr = 2'b0;
-    reg  [31:0]            int_xfer_size = 'b0;
-    reg  [63:0]            int_gmem_ptr = 'b0;
+{internal_regs}
 
 //------------------------Instantiation------------------
 
@@ -118,7 +156,7 @@ assign AWREADY = (wstate == WRIDLE);
 assign WREADY  = (wstate == WRDATA);
 assign BRESP   = 2'b00;  // OKAY
 assign BVALID  = (wstate == WRRESP);
-assign wmask   = { {8{WSTRB[3]}}, {8{WSTRB[2]}}, {8{WSTRB[1]}}, {8{WSTRB[0]}} };
+assign wmask   = {{ {{8{{WSTRB[3]}}}}, {{8{{WSTRB[2]}}}}, {{8{{WSTRB[1]}}}}, {{8{{WSTRB[0]}}}} }};
 assign aw_hs   = AWVALID & AWREADY;
 assign w_hs    = WVALID & WREADY;
 
@@ -217,15 +255,7 @@ always @(posedge ACLK) begin
                 ADDR_ISR: begin
                     rdata <= int_isr;
                 end
-                ADDR_XFER_SIZE_DATA_0: begin
-                    rdata <= int_xfer_size[31:0];
-                end
-                ADDR_GMEM_PTR_DATA_0: begin
-                    rdata <= int_gmem_ptr[31:0];
-                end
-                ADDR_GMEM_PTR_DATA_1: begin
-                    rdata <= int_gmem_ptr[63:32];
-                end
+{rdatas}
             endcase
         end
     end
@@ -235,8 +265,7 @@ end
 //------------------------Register logic-----------------
 assign interrupt = int_gie & (|int_isr);
 assign ap_start  = int_ap_start;
-assign xfer_size = int_xfer_size;
-assign gmem_ptr  = int_gmem_ptr;
+{reg_assigns}
 // int_ap_start
 always @(posedge ACLK) begin
     if (ARESET)
@@ -333,40 +362,60 @@ always @(posedge ACLK) begin
     end
 end
 
-// int_xfer_size[31:0]
-always @(posedge ACLK) begin
-    if (ARESET)
-        int_xfer_size[31:0] <= 0;
-    else if (ACLK_EN) begin
-        if (w_hs && waddr == ADDR_XFER_SIZE_DATA_0)
-            int_xfer_size[31:0] <=
-                (WDATA[31:0] & wmask) | (int_xfer_size[31:0] & ~wmask);
-    end
-end
-
-// int_gmem_ptr[31:0]
-always @(posedge ACLK) begin
-    if (ARESET)
-        int_gmem_ptr[31:0] <= 0;
-    else if (ACLK_EN) begin
-        if (w_hs && waddr == ADDR_GMEM_PTR_DATA_0)
-            int_gmem_ptr[31:0] <=
-                (WDATA[31:0] & wmask) | (int_gmem_ptr[31:0] & ~wmask);
-    end
-end
-
-// int_gmem_ptr[63:32]
-always @(posedge ACLK) begin
-    if (ARESET)
-        int_gmem_ptr[63:32] <= 0;
-    else if (ACLK_EN) begin
-        if (w_hs && waddr == ADDR_GMEM_PTR_DATA_1)
-            int_gmem_ptr[63:32] <=
-                (WDATA[31:0] & wmask) | (int_gmem_ptr[63:32] & ~wmask);
-    end
-end
-
+{wdatas}
 
 //------------------------Memory logic-------------------
 
 endmodule
+'''.format(name=name,
+        ports=ports,
+        addr_infos=addr_infos,
+        localparam_addrs=localparam_addrs,
+        internal_regs=internal_regs,
+        rdatas=rdatas,
+        wdatas=wdatas,
+        reg_assigns=reg_assigns)
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Script for generating package tcl script')
+
+    parser.add_argument('config', nargs=1, help='The config file describing the core')
+    parser.add_argument('-o', '--output', help='The output path for the resulting tcl script', metavar='<file>', nargs=1, default=['package_kernel.tcl'])
+    parser.add_argument('-f', '--force', help='Toggles whether output file should be overwritten', action='store_true')
+
+    args = parser.parse_args()
+
+    if not os.path.exists(args.config[0]):
+        print (f'Error, {args.config} does not exist')
+        quit(1)
+    with open(args.config[0], 'r') as f:
+        config = json.load(f)
+
+    ports = ''
+    addr_infos = ''
+    localparam_addrs = ''
+    internal_regs = ''
+    rdatas = ''
+    wdatas = ''
+    reg_assigns = ''
+    addr = 0x10
+    params = [(name, bits) for name, bits in config['params']['scalars'].items()] + \
+            [(name, 64) for name, _ in config['params']['memory'].items()]
+    for name, bits in params:
+        ports += port(bits, name)
+        addr_infos += addr_info(addr, bits, name)
+        localparam_addrs += localparam_addr(6, bits, addr, name)
+        internal_regs += internal_reg(bits, name)
+        rdatas += rdata(bits, name)
+        wdatas += wdata(bits, name)
+        reg_assigns += reg_assign(name)
+        addr += bits//8 + 4
+
+    control_module_str = control_module(config['name'], ports, addr_infos, localparam_addrs, internal_regs, rdatas, wdatas, reg_assigns)
+
+    if not args.force and os.path.exists(args.output[0]):
+        print (f'Error, "{args.output[0]}" already exists. Add -f flag to overwrite')
+        quit(1)
+    with open(args.output[0], 'w') as f:
+        f.write(control_module_str)
+

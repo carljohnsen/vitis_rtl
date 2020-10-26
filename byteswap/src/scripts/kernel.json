@@ -1,4 +1,5 @@
 {
+    "name" : "byteswap",
     "buses" : [
         "m_axi_gmem"
     ],

@@ -41,7 +41,9 @@ VIVADO_FLAGS = -mode batch -log $(LOG_DIR)/vivado.log -journal $(LOG_DIR)/vivado
 VPP_FLAGS = --log_dir $(LOG_DIR) -t $(TARGET) -f $(PLATFORM) -s --report_dir $(REPORT_DIR)
 
 # Source files
+CONTROL_TEMPLATE = $(TEMPLATES_DIR)/control.py
 HOST_FILES = $(SRC_DIR)/host.cpp
+KERNEL_CONTROLS = $(foreach KRNL, $(RTL_KERNELS), $(SRC_HDL_DIR)/$(KRNL)/$(KRNL)_control.v)
 PACKAGE_TEMPLATE = $(TEMPLATES_DIR)/package.py
 TCL_PACKAGE = $(SCRIPT_DIR)/package_kernel.tcl
 TCL_ELABORATE = $(SCRIPT_DIR)/test_elaborate.tcl
@@ -67,6 +69,7 @@ clean:
 	rm -rf ./$(BUILD_DIR) ./$(LOG_DIR)
 	rm -f ./hs_err_pid* ./profile_kernels.csv ./timeline_kernels.csv
 	rm -rf ./.ipcache/ ./.Xil/ ./$(PLATFORM)-* ./.hbs/
+	rm -f $(TCL_PACKAGE) $(KERNEL_CONTROLS)
 
 build: $(DEVICE_BINARY) $(HOST_BINARY) $(EMCONFIG)
 
@@ -74,7 +77,7 @@ run: all
 	XCL_EMULATION_MODE=$(TARGET) $(HOST_BINARY) $(DEVICE_BINARY)
 
 # Device specific rules
-pack: $(TCL_PACKAGE) $(RTL_XO_TARGETS)
+pack: $(KERNEL_CONTROLS) $(TCL_PACKAGE) $(RTL_XO_TARGETS)
 
 elaborate_%: $(TCL_SYNTH) $(SRC_HDL_DIR)/%/*.*v
 	rm -rf $(VIVADO_ELABORATE_DIR)
@@ -85,6 +88,9 @@ synth_%: $(TCL_SYNTH) $(SRC_HDL_DIR)/%/*.*v
 	rm -rf $(VIVADO_SYNTH_DIR)
 	mkdir -p $(VIVADO_SYNTH_DIR) $(LOG_DIR)
 	$(VIVADO) $(VIVADO_FLAGS) -source $(TCL_SYNTH) -tclargs $(SRC_HDL_DIR)/$(*F) $(*F) $(VIVADO_SYNTH_DIR) $(RTLLIB_DIR)
+
+$(KERNEL_CONTROLS): %.v: $(CONTROL_TEMPLATE) $(KERNEL_CONFIG)
+	python3 $(CONTROL_TEMPLATE) $(KERNEL_CONFIG) -o $@ -f
 
 $(TCL_PACKAGE): $(PACKAGE_TEMPLATE) $(KERNEL_CONFIG)
 	python3 $(PACKAGE_TEMPLATE) $(KERNEL_CONFIG) -o $(TCL_PACKAGE) -f
