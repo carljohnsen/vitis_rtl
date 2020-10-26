@@ -7,7 +7,8 @@
 */xilinx_u250_xdma_*
 */xrc.log
 */.ipcache
-*.swp
+*/**.swp
 */.Xil
-*/package_kernel.tcl
 */src/hdl/*/*_control.v
+*/generated
+*/scripts

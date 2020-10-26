@@ -29,9 +29,9 @@ def package_script(bus_clks, ip_cores, scalar_regs, memory_ptr_regs):
 #
 # Argument parsing
 #
-if {{ $::argc != 5 }} {{
-    puts "Error: Program \\"$::argv0\\" requires 5 arguments.\\n"
-    puts "Usage: $::argv0 <xoname> <kernel_name> <build_dir> <rtl_src_dir> <include_dir>\\n"
+if {{ $::argc != 6 }} {{
+    puts "Error: Program \\"$::argv0\\" requires 6 arguments.\\n"
+    puts "Usage: $::argv0 <xoname> <kernel_name> <build_dir> <rtl_src_dir> <library_dir> <generate_dir>\\n"
     exit
 }}
 
@@ -39,7 +39,8 @@ set xoname      [lindex $::argv 0]
 set kernel_name [lindex $::argv 1]
 set build_dir   [lindex $::argv 2]
 set src_dir     [lindex $::argv 3]
-set include_dir [lindex $::argv 4]
+set lib_dir     [lindex $::argv 4]
+set gen_dir     [lindex $::argv 5]
 
 set tmp_dir "$build_dir/tmp"
 set pkg_dir "$build_dir/pkg"
@@ -48,7 +49,7 @@ set pkg_dir "$build_dir/pkg"
 # Build the kernel
 #
 create_project kernel_packing $tmp_dir
-add_files [glob $src_dir/*.v $src_dir/*.sv $include_dir/*.v $include_dir/*.sv]
+add_files [glob $src_dir/*.*v $lib_dir/*.*v $gen_dir/*.*v]
 {ip_cores}
 update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1

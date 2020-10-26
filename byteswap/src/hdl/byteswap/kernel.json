@@ -11,6 +11,6 @@
             "gmem_ptr" : "m_axi_gmem"
         }
     },
-    "ips" : {
+    "ip_cores" : {
     }
 }

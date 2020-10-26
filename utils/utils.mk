@@ -5,13 +5,14 @@
 BUILD_DIR = build
 BIN_DIR = $(BUILD_DIR)/bin
 CONFIGS_DIR = $(SRC_DIR)/configs
+GENERATED_DIR = generated
 HLSLIB_DIR = ../hlslib
 LOG_DIR = logs
 OBJ_DIR = $(BUILD_DIR)/obj
 PKG_DIR = $(BUILD_DIR)/pkg
 REPORT_DIR = $(VITIS_BUILD_DIR)/reports
 RTLLIB_DIR = $(UTILS_DIR)/rtl
-SCRIPT_DIR = $(SRC_DIR)/scripts
+SCRIPT_DIR = scripts
 SRC_DIR = src
 SRC_HDL_DIR = $(SRC_DIR)/hdl
 SRC_HLS_DIR = $(SRC_DIR)/hls
@@ -43,20 +44,21 @@ VPP_FLAGS = --log_dir $(LOG_DIR) -t $(TARGET) -f $(PLATFORM) -s --report_dir $(R
 # Source files
 CONTROL_TEMPLATE = $(TEMPLATES_DIR)/control.py
 HOST_FILES = $(SRC_DIR)/host.cpp
-KERNEL_CONTROLS = $(foreach KRNL, $(RTL_KERNELS), $(SRC_HDL_DIR)/$(KRNL)/$(KRNL)_control.v)
+KERNEL_CONFIGS = $(foreach KRNL, $(RTL_KERNELS), $(SRC_HDL_DIR)/$(KRNL)/kernel.json)
 PACKAGE_TEMPLATE = $(TEMPLATES_DIR)/package.py
-TCL_PACKAGE = $(SCRIPT_DIR)/package_kernel.tcl
-TCL_ELABORATE = $(SCRIPT_DIR)/test_elaborate.tcl
-TCL_SYNTH = $(SCRIPT_DIR)/test_synth.tcl
+SYNTH_TEMPLATE = $(TEMPLATES_DIR)/synth.py
 
-# Binary files
+# Target files
 CPP_XO_TARGETS = $(foreach KRNL, $(CPP_KERNELS), $(OBJ_DIR)/cpp_$(KRNL).xo)
 DEVICE_BINARY = $(BIN_DIR)/$(NAME).xclbin
 EMCONFIG = $(BIN_DIR)/emconfig.json
 HOST_BINARY = $(BIN_DIR)/$(NAME)
+KERNEL_CONTROLS = $(foreach KRNL, $(RTL_KERNELS), $(GENERATED_DIR)/$(KRNL)_control.v)
 LINKED_KERNEL = $(OBJ_DIR)/$(NAME).link.xclbin
 OBJECTS = $(OBJ_DIR)/host.o
 RTL_XO_TARGETS = $(foreach KRNL, $(RTL_KERNELS), $(OBJ_DIR)/rtl_$(KRNL).xo)
+TCL_PACKAGES = $(foreach KRNL, $(RTL_KERNELS), $(SCRIPT_DIR)/$(KRNL)_package.tcl)
+TCL_SYNTHS = $(foreach KRNL, $(RTL_KERNELS), $(SCRIPT_DIR)/$(KRNL)_synth.tcl)
 
 #########
 # Rules #
@@ -66,10 +68,9 @@ all: build
 
 # TODO also remove some of the hidden folders, and find a way to move all this pesky logging...
 clean:
-	rm -rf ./$(BUILD_DIR) ./$(LOG_DIR)
-	rm -f ./hs_err_pid* ./profile_kernels.csv ./timeline_kernels.csv
+	rm -rf ./$(BUILD_DIR) ./$(LOG_DIR) ./$(SCRIPT_DIR) ./$(GENERATED_DIR)
 	rm -rf ./.ipcache/ ./.Xil/ ./$(PLATFORM)-* ./.hbs/
-	rm -f $(TCL_PACKAGE) $(KERNEL_CONTROLS)
+	rm -f ./hs_err_pid* ./profile_kernels.csv ./timeline_kernels.csv
 
 build: $(DEVICE_BINARY) $(HOST_BINARY) $(EMCONFIG)
 
@@ -77,28 +78,34 @@ run: all
 	XCL_EMULATION_MODE=$(TARGET) $(HOST_BINARY) $(DEVICE_BINARY)
 
 # Device specific rules
-pack: $(KERNEL_CONTROLS) $(TCL_PACKAGE) $(RTL_XO_TARGETS)
+pack: $(KERNEL_CONTROLS) $(TCL_PACKAGES) $(RTL_XO_TARGETS)
 
-elaborate_%: $(TCL_SYNTH) $(SRC_HDL_DIR)/%/*.*v
+$(TCL_SYNTHS): $(SCRIPT_DIR)/%_synth.tcl: $(SYNTH_TEMPLATE) $(SRC_HDL_DIR)/%/kernel.json
+	mkdir -p $(SCRIPT_DIR)
+	python3 $(SYNTH_TEMPLATE) $(KERNEL_CONFIG) -o $@ -f
+
+elaborate_%: $(SCRIPT_DIR)/%_synth.tcl $(SRC_HDL_DIR)/%/*.*v
 	rm -rf $(VIVADO_ELABORATE_DIR)
 	mkdir -p $(VIVADO_ELABORATE_DIR) $(LOG_DIR)
 	$(VIVADO) $(VIVADO_FLAGS) -source $(TCL_SYNTH) -tclargs $(SRC_HDL_DIR)/$(*F) $(*F) $(VIVADO_ELABORATE_DIR) $(RTLLIB_DIR) -rtl
 
-synth_%: $(TCL_SYNTH) $(SRC_HDL_DIR)/%/*.*v
+synth_%: $(SCRIPT_DIR)/%_synth.tcl $(SRC_HDL_DIR)/%/*.*v
 	rm -rf $(VIVADO_SYNTH_DIR)
 	mkdir -p $(VIVADO_SYNTH_DIR) $(LOG_DIR)
 	$(VIVADO) $(VIVADO_FLAGS) -source $(TCL_SYNTH) -tclargs $(SRC_HDL_DIR)/$(*F) $(*F) $(VIVADO_SYNTH_DIR) $(RTLLIB_DIR)
 
-$(KERNEL_CONTROLS): %.v: $(CONTROL_TEMPLATE) $(KERNEL_CONFIG)
-	python3 $(CONTROL_TEMPLATE) $(KERNEL_CONFIG) -o $@ -f
+$(KERNEL_CONTROLS): $(GENERATED_DIR)/%_control.v: $(CONTROL_TEMPLATE) $(SRC_HDL_DIR)/%/kernel.json
+	mkdir -p $(GENERATED_DIR)
+	python3 $^ -o $@ -f
 
-$(TCL_PACKAGE): $(PACKAGE_TEMPLATE) $(KERNEL_CONFIG)
-	python3 $(PACKAGE_TEMPLATE) $(KERNEL_CONFIG) -o $(TCL_PACKAGE) -f
+$(TCL_PACKAGES): $(SCRIPT_DIR)/%_package.tcl: $(PACKAGE_TEMPLATE) $(SRC_HDL_DIR)/%/kernel.json
+	mkdir -p $(SCRIPT_DIR)
+	python3 $^ -o $@ -f
 
-$(OBJ_DIR)/rtl_%.xo: $(TCL_PACKAGE) $(SRC_HDL_DIR)/%/*.*v
+$(OBJ_DIR)/rtl_%.xo: $(SCRIPT_DIR)/%_package.tcl $(GENERATED_DIR)/%_control.v $(SRC_HDL_DIR)/%/*.*v
 	rm -rf $(VIVADO_PACKAGE_DIR)/$(*F) $@
 	mkdir -p $(VIVADO_PACKAGE_DIR)/$(*F) $(OBJ_DIR) $(LOG_DIR)
-	$(VIVADO) $(VIVADO_FLAGS) -source $(TCL_PACKAGE) -tclargs $@ $(*F) $(VIVADO_PACKAGE_DIR)/$(*F) $(SRC_HDL_DIR)/$(*F) $(RTLLIB_DIR)
+	$(VIVADO) $(VIVADO_FLAGS) -source $< -tclargs $@ $(*F) $(VIVADO_PACKAGE_DIR)/$(*F) $(SRC_HDL_DIR)/$(*F) $(RTLLIB_DIR) $(GENERATED_DIR)
 
 $(OBJ_DIR)/cpp_%.xo: $(SRC_HLS_DIR)/%.cpp
 	mkdir -p $(OBJ_DIR) $(VITIS_BUILD_DIR)/$(*F) $(REPORT_DIR) $(LOG_DIR)
