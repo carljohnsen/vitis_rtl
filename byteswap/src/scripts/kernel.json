@@ -1,0 +1,15 @@
+{
+    "buses" : [
+        "m_axi_gmem"
+    ],
+    "params" : {
+        "scalars" : {
+            "xfer_size" : 32
+        },
+        "memory" : {
+            "gmem_ptr" : "m_axi_gmem"
+        }
+    },
+    "ips" : {
+    }
+}

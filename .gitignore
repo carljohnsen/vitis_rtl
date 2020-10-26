@@ -9,4 +9,4 @@
 */.ipcache
 *.swp
 */.Xil
-bash_source.sh
+*/package_kernel.tcl
