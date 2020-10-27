@@ -8,8 +8,8 @@ def set_params(params, module_name):
     tmp = 'set_property -dict [list'
     for key, value in params.items():
         tmp += f' {key} {{{value}}}'
-    tmp += '] [get_ips {module_name}]\n'
-    return
+    tmp += f'] [get_ips {module_name}]\n'
+    return tmp
 
 def synth_script(ip_cores):
     synth_ip = 'synth_ip [get_ips]' if ip_cores != '' else ''
@@ -34,7 +34,9 @@ set_property top_file {{$src_dir/$top_file}} [current_fileset]
 {ip_cores}
 update_compile_order -fileset sources_1
 update_compile_order -fileset sources_1
+set_msg_config -id "HDL" -new_severity "ERROR"
 check_syntax
+reset_msg_config -id "HDL" -default_severity
 {synth_ip}
 if {{ $::argc == 6 }} {{
     synth_design -top $top_file -rtl

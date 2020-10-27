@@ -12,7 +12,7 @@ def addr_info(addr, bits, name):
     return tmp
 
 def port(bits, name):
-    return f'    output wire [{bits}:0] {name},\n'
+    return f'    output wire [{bits-1}:0] {name},\n'
 
 def localparam_addr(addr_width, bits, addr, name):
     tmp = ''

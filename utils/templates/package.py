@@ -22,7 +22,17 @@ set reg [::ipx::add_register -quiet "{param_name}" $addr_block]
 '''.format(param_name=param_name, addr=addr, busname=busname)
 
 def bus_clk(param_name):
-    return f'ipx::associate_bus_interfaces -busif {param_name} -clock ap_clk $core'
+    return f'ipx::associate_bus_interfaces -busif {param_name} -clock ap_clk $core\n'
+
+def create(name, vendor, version, module_name):
+    return f'create_ip -name {name} -vendor {vendor} -library ip -version {version} -module_name {module_name}\n'
+
+def set_params(params, module_name):
+    tmp = 'set_property -dict [list'
+    for key, value in params.items():
+        tmp += f' {key} {{{value}}}'
+    tmp += f'] [get_ips {module_name}]\n'
+    return tmp
 
 def package_script(bus_clks, ip_cores, scalar_regs, memory_ptr_regs):
     return '''
@@ -57,6 +67,7 @@ set_property top $kernel_name [current_fileset]
 set_property top_file {{$src_dir/$kernel_name}} [current_fileset]
 set_msg_config -id "HDL" -new_severity "ERROR"
 check_syntax
+reset_msg_config -id "HDL" -default_severity
 ipx::package_project -root_dir $pkg_dir -vendor xilinx.com -library RTLKernel -taxonomy /KernelIP -import_files -set_current false
 ipx::unload_core $pkg_dir/component.xml
 ipx::edit_ip_in_project -upgrade true -name tmp_project -directory $pkg_dir $pkg_dir/component.xml
@@ -192,8 +203,10 @@ if __name__ == '__main__':
     for name in config['buses']:
         bus_clks += bus_clk(name)
 
-    # TODO
     ip_cores = ''
+    for name, info in config['ip_cores'].items():
+        ip_cores += create(name, info['vendor'], info['version'], info['module_name'])
+        ip_cores += set_params(info['params'], info['module_name'])
 
     addr = 0x10
     scalars = ''
