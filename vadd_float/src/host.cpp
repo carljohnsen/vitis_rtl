@@ -5,7 +5,8 @@
 #include "hlslib/xilinx/SDAccel.h"
 
 #define KB 256
-#define DATA_SIZE 100 * 1024 * KB
+//#define DATA_SIZE 100 * 1024 * KB
+#define DATA_SIZE 16 * KB
 
 int main(int argc, char **argv) {
     // Check the arguments and load them
@@ -18,13 +19,14 @@ int main(int argc, char **argv) {
     // Allocate host memory and input data
     srand(time(NULL));
     const auto size = DATA_SIZE;
-    std::vector<float> input_data(size), expected_result(size), result(size);
+    std::vector<float> input_a(size), input_b(size), expected_result(size), result(size);
     for (int i = 0; i < size; i++) {
         // Input data
-        input_data[i] = (static_cast<float>(rand()) / (static_cast<float>(RAND_MAX))) * 1000.;
+        input_a[i] = (static_cast<float>(rand()) / (static_cast<float>(RAND_MAX))) * 1000.;
+        input_b[i] = (static_cast<float>(rand()) / (static_cast<float>(RAND_MAX))) * 1000.;
 
         // Compute the results
-        expected_result[i] = input_data[i] + input_data[i];
+        expected_result[i] = input_a[i] + input_b[i];
     }
 
     // Get the context
@@ -34,20 +36,25 @@ int main(int argc, char **argv) {
     auto program = context.MakeProgram(binary_file);
 
     // Initialize device memory
-    auto gmem = context.MakeBuffer<float, hlslib::ocl::Access::readWrite>(
+    auto a = context.MakeBuffer<float, hlslib::ocl::Access::read>(
             hlslib::ocl::MemoryBank::bank0, size);
+    auto b = context.MakeBuffer<float, hlslib::ocl::Access::read>(
+            hlslib::ocl::MemoryBank::bank1, size);
+    auto c = context.MakeBuffer<float, hlslib::ocl::Access::write>(
+            hlslib::ocl::MemoryBank::bank2, size);
 
     // Copy to device
-    gmem.CopyFromHost(input_data.begin());
+    a.CopyFromHost(input_a.begin());
+    b.CopyFromHost(input_b.begin());
 
     // Create the kernel
-    auto kernel = program.MakeKernel("vadd_float", size*4, gmem);
+    auto kernel = program.MakeKernel("vadd_float", size, a, b, c);
 
     // Execute kernel
     const auto elapsed = kernel.ExecuteTask();
 
     // Copy back the results
-    gmem.CopyToHost(result.begin());
+    c.CopyToHost(result.begin());
 
     // Compare the results of the Device to the simulation
     int match = 0;
@@ -56,7 +63,9 @@ int main(int argc, char **argv) {
             std::cout << "Error: Result mismatch" << std::endl;
             std::cout << "i = " << i << " Software result = " << expected_result[i]
                       << " Device result = " << result[i] << std::endl;
-            match = 1;
+            match++;
+            if (match >= 16)
+                break;
         }
     }
 

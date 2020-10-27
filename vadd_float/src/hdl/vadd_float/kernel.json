@@ -1,0 +1,34 @@
+{
+    "name" : "vadd_float",
+    "buses" : [
+        "m_axi_a",
+        "m_axi_b",
+        "m_axi_result"
+    ],
+    "params" : {
+        "scalars" : {
+            "xfer_size" : 32
+        },
+        "memory" : {
+            "a" : "m_axi_a",
+            "b" : "m_axi_b",
+            "c" : "m_axi_result"
+        }
+    },
+    "ip_cores" : {
+        "floating_point" : {
+            "vendor" : "xilinx.com",
+            "version" : "7.1",
+            "module_name" : "floating_point_0",
+            "params" : {
+                "CONFIG.Add_Sub_Value" : "Add",
+                "CONFIG.Has_ARESETn" : "true",
+                "CONFIG.Has_A_TLAST" : "true",
+                "CONFIG.Has_A_TUSER" : "false",
+                "CONFIG.Has_B_TLAST" : "true",
+                "CONFIG.Has_B_TUSER" : "false",
+                "CONFIG.RESULT_TLAST_Behv" : "OR_all_TLASTs"
+            }
+        }
+    }
+}
