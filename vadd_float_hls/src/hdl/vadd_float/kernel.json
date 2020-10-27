@@ -1,0 +1,30 @@
+{
+    "name" : "vadd_float",
+    "buses" : [
+        "s_axis_a",
+        "s_axis_b",
+        "m_axis_c"
+    ],
+    "params" : {
+        "scalars" : {
+        },
+        "memory" : {
+        }
+    },
+    "ip_cores" : {
+        "floating_point" : {
+            "vendor" : "xilinx.com",
+            "version" : "7.1",
+            "module_name" : "floating_point_0",
+            "params" : {
+                "CONFIG.Add_Sub_Value" : "Add",
+                "CONFIG.Has_ARESETn" : "true",
+                "CONFIG.Has_A_TLAST" : "true",
+                "CONFIG.Has_A_TUSER" : "false",
+                "CONFIG.Has_B_TLAST" : "true",
+                "CONFIG.Has_B_TUSER" : "false",
+                "CONFIG.RESULT_TLAST_Behv" : "OR_all_TLASTs"
+            }
+        }
+    }
+}
