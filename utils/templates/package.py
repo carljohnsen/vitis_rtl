@@ -59,7 +59,7 @@ set pkg_dir "$build_dir/pkg"
 #
 # Build the kernel
 #
-create_project kernel_packing $tmp_dir
+create_project kernel_packing $tmp_dir -force
 add_files [glob $src_dir/*.*v $lib_dir/*.*v $gen_dir/*.*v]
 {ip_cores}
 update_compile_order -fileset sources_1
@@ -179,7 +179,7 @@ close_project
 #
 # Package the kernel
 #
-package_xo -xo_path ${{xoname}} -kernel_name $kernel_name -ip_directory $pkg_dir
+package_xo -xo_path ${{xoname}} -kernel_name $kernel_name -ip_directory $pkg_dir -force
 '''.format(bus_clks=bus_clks,
         ip_cores=ip_cores,
         scalar_regs=scalar_regs,
