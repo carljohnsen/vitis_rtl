@@ -1,9 +1,9 @@
 all:
 	cmake -Bbuild -H.
-	cd build && make
+	cd build && make VERBOSE=1 -j4
 
 clean:
 	rm -rf build
 
-run:
+run: all
 	cd build && make run
