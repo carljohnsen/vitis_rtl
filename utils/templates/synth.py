@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import argparse
 import json
 import os
@@ -26,7 +27,7 @@ set build_dir [lindex $::argv 2]
 set lib_dir   [lindex $::argv 3]
 set gen_dir   [lindex $::argv 4]
 
-create_project batch_synthesis $build_dir/synthesis -part xcu250-figd2104-2L-e
+create_project batch_synthesis $build_dir/synthesis -part xcu250-figd2104-2L-e -force
 set_property board_part xilinx.com:au250:part0:1.3 [current_project]
 add_files [glob $src_dir/*.*v $lib_dir/*.*v $gen_dir/*.*v]
 set_property top $top_file [current_fileset]

@@ -1,9 +1,18 @@
-all:
+cmake:
 	cmake -Bbuild -H.
-	cd build && make VERBOSE=1 -j4
+
+all: cmake
+	cd build && make -j4
 
 clean:
 	rm -rf build
 
 run: all
 	cd build && make run
+
+synth_%: cmake
+	cd build && make synth_$(*F)
+
+elaborate_%: cmake
+	cd build && make elaborate_$(*F)
+
