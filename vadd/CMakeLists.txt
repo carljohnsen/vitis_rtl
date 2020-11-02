@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 3.1.5)
 project(vadd)
 set (RTL_KERNELS krnl_vadd_rtl)
-set (VPP_TARGet hw_emu)
+if (NOT DEFINED VPP_TARGET)
+    set (VPP_TARGET hw_emu)
+endif()
 
-get_filename_component(PARENT_DIR "${CMAKE_SOURCE_DIR}/.." ABSOLUTE)
+get_filename_component(PARENT_DIR "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
 set(UTILS_DIR "${PARENT_DIR}/utils")
 include ("${UTILS_DIR}/CMakeLists.txt")

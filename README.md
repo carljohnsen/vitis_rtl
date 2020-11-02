@@ -9,8 +9,7 @@ This repository holds different Vitis projects, which implement RTL kernels writ
 # Building/running a project
 ```
 cmake -Bbuild -H.
-cd build
-make run
+cmake --build build --target run -- -j32
 ```
 
 # Building/Running a project (OUT OF DATE)
