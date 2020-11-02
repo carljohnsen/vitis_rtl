@@ -6,7 +6,14 @@ This repository holds different Vitis projects, which implement RTL kernels writ
 - [Xilinx Runtime Library (XRT)](https://www.xilinx.com/products/design-tools/vitis/xrt.html)
 - [Xilinx Alveo U250 platform](https://www.xilinx.com/products/boards-and-kits/alveo/u250.html#gettingStarted)
 
-# Building/Running a project
+# Building/running a project
+```
+cmake -Bbuild -H.
+cd build
+make run
+```
+
+# Building/Running a project (OUT OF DATE)
 All of the projects requires the environment variables from Xilinx Vitis and Xilinx Runtime Library (XRT). Assuming both are installed in `/opt/`, run the following commands from a `bash` shell (For some reason, `zsh` won't work):
 ```
 source /opt/Xilinx/Vitis/2020.1/settings64.sh

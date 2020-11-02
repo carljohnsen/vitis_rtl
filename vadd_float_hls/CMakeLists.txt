@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.1.5)
-project(byteswap)
-set (RTL_KERNELS byteswap)
+project(vadd)
+set (RTL_KERNELS vadd_float)
+set (CPP_KERNELS reader writer)
 set (VPP_TARGet hw_emu)
 
 get_filename_component(PARENT_DIR "${CMAKE_SOURCE_DIR}/.." ABSOLUTE)
