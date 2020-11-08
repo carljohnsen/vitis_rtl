@@ -1,89 +1,110 @@
 # Vitis RTL samples
-This repository holds different Vitis projects, which implement RTL kernels written in Verilog. Some are generated using the RTL Kernel Wizard in Xilinx Vivado, while others are a mix of generated files and hand-written RTL files.
+This repository holds different Vitis projects, which implement RTL kernels
+written in Verilog. Some are generated using the RTL Kernel Wizard in Xilinx
+Vivado, while others are a mix of generated files and hand-written RTL files.
 
 # Prerequisites
-- [Xilinx Vitis 2020.1](https://www.xilinx.com/products/design-tools/vitis/vitis-platform.html)
-- [Xilinx Runtime Library (XRT)](https://www.xilinx.com/products/design-tools/vitis/xrt.html)
-- [Xilinx Alveo U250 platform](https://www.xilinx.com/products/boards-and-kits/alveo/u250.html#gettingStarted)
+- [CMake >= 3.12.4](https://github.com/Kitware/CMake)
+- [Xilinx Vitis 2020.1](https://www.xilinx.com/products/design-tools/vitis/
+  vitis-platform.html)
+- [Xilinx Runtime Library (XRT)](https://www.xilinx.com/products/design-tools/
+  vitis/xrt.html)
+- A Xilinx platform, such as the [Xilinx Alveo U250 platform](https://
+  www.xilinx.com/products/boards-and-kits/alveo/u250.html#gettingStarted)
 
 # Building/running a project
+First, all of the environment variables for Xilinx Vivado need to be set. An
+example shell file with the default variables can be sourced or added to rc
+file (e.g. `~/.bashrc`):
+```
+source source.sh
+```
+
+To generate all of the build scripts in a folder called `build/`:
 ```
 cmake -Bbuild -H.
-cmake --build build --target run -- -j32
 ```
 
-# Building/Running a project (OUT OF DATE)
-All of the projects requires the environment variables from Xilinx Vitis and Xilinx Runtime Library (XRT). Assuming both are installed in `/opt/`, run the following commands from a `bash` shell (For some reason, `zsh` won't work):
+To build all of the projects:
 ```
-source /opt/Xilinx/Vitis/2020.1/settings64.sh
-source /opt/xilinx/xrt/setup.sh
-export LIBRARY_PATH=/usr/lib/x86_64-linux-gnu
-```
-Each project has its own `Makefile`. So to run either, `cd` into their directory and run one of the following commands:
-
-To check whether Xilinx Vivado can parse and elaborate the RTL code:
-```
-make elaborate
+cmake --build build
 ```
 
-To check whether Xilinx Vivado can synthesize the RTL code:
+To build a single project, here `byteswap` is used as an example:
 ```
-make synth
-```
-
-To build a project (both host and device code):
-```
-make build
+cmake --build build --target build_byteswap
 ```
 
-And to run a project:
+To run all of the projects:
 ```
-make run
+cmake --build build --target run
 ```
 
-# File structure
+To run a single project, here `byteswap` is used as an example:
 ```
-.
-|-- Makefile
-`-- src/
-    |-- configs/
-    |   |-- build.ini
-    |   |-- link.ini
-    |   `-- package.ini
-    |
-    |-- hdl/
-    |   |-- rtl_kernel_0/
+cmake --build build --target run_byteswap
+```
+
+# Project file structure
+Files encapsulated in `[]` are optional files and folders. Filenames with `*`
+indicates the glob pattern for source files. The filenames such as
+`rtl_kernel_0` and `hls_kernel_0` are purely suggestions.
+```
+project/
+|-- CMakeLists.txt          # cmake configuration
+`-- src
+    |-- [configs]           # optional folder for v++ configs
+    |   |-- [build.ini]     # optional v++ config for build HLS kernels
+    |   |-- [link.ini]      # optional v++ config for linking .xo kernels
+    |   `-- [package.ini]   # optional v++ config for packaging .xclbin binary
+    |-- [hdl]
+    |   `-- rtl_kernel_0
+    |   |   |-- kernel.json # kernel configuration for generating scripts
     |   |   |-- *.v
     |   |   `-- *.sv
-    |   |
-    |   `-- rtl_kernel_1/
+    |   `-- rtl_kernel_1
+    |       |-- kernel.json
     |       |-- *.v
     |       `-- *.sv
-    |
-    |-- hls/
+    |-- [hls]
     |   |-- hls_kernel_0.cpp
     |   `-- hls_kernel_1.cpp
-    |
-    |-- host.cpp
-    |
-    `-- scripts/
-        |-- package_kernel.tcl
-        `-- test_synth.tcl
+    `-- host.cpp
 ```
 
 # Projects
-- [Byteswap](byteswap/) - Swaps the order of bytes in each input, so the least significant byte becomes the most significant byte.
-- [Vector add](vadd/) - Sums the two input vectors. It is a modified version of the [Xilinx](https://github.com/Xilinx/Vitis_Accel_Examples/tree/master/rtl_kernels/rtl_vadd) sample.
-- [Vector add floating point](vadd_float/) - Same as Vector add, but uses the [Xilinx Floating Point IP](https://www.xilinx.com/support/documentation/ip_documentation/floating_point/v7_1/pg060-floating-point.pdf) for the addition.
-- [Vector add floating point hls](vadd_float_hls/) - Multi kernel Vector add, with HLS for memory management and with RTL as compute kernel.
-- [Vector add floating point hls pure](vadd_float_hls_pure) - Multi kernel Vector add, written purely in HLS.
+- [Byteswap](byteswap/) - Swaps the order of bytes for each 32 bit input, so
+  the least significant byte becomes the most significant byte.
+- [Vector add](vadd/) - Sums the two input vectors. It is a modified version of
+  the [Xilinx](https://github.com/Xilinx/Vitis_Accel_Examples/tree/master/
+  rtl_kernels/rtl_vadd) sample.
+- [Vector add floating point](vadd_float/) - Same as Vector add, but uses the
+  [Xilinx Floating Point IP](https://www.xilinx.com/support/documentation/
+  ip_documentation/floating_point/v7_1/pg060-floating-point.pdf) for the
+  addition.
+- [Vector add floating point hls](vadd_float_hls/) - Multi kernel Vector add,
+  with HLS for memory management and with RTL as compute kernel.
+- [Vector add floating point hls pure](vadd_float_hls_pure) - Multi kernel
+  Vector add, written purely in HLS.
 
 # Utilities
-- `utils.mk` - a library of commonly used Makefile rules and variables.
-- `host.cpp` - TODO a template host program containing most of the generic boilerplate OpenCL code.
-- `package_kernel.tcl` - TODO a template TCL script containing most of the generic boilerplate Vivado project TCL code.
-- `test_synthesis.tcl` - TODO a template TCL script for testing whether the RTL code can be synthesized.
-- `empty_project` - TODO an empty project containing the basic requirements for a project, such as `Makefile` and folder structure.
-
-
-6 directories, 11 files
+- [CMakeLists](utils/CMakeLists.txt) - cmake file containing all the rules and
+  commands for building the projects.
+- [rtl/](utils/rtl/) - RTL library with implementations of utility cores.
+- - [axi_counter](utils/rtl/axi_counter.sv) - Counter, which is used by the AXI
+    cores.
+- - [axi_read_master](utils/rtl/axi_read_master.sv) - Multi channel AXI read
+    master.
+- - [axi_write_master](utils/rtl/axi_write_master.sv) - Multi channel AXI write
+    master.
+- [templates/](utils/templates) - Python scripts for generating TCL scripts and
+  RTL files.
+- - [control](utils/templates/control.py) - Python script for generating a
+    Verilog controller for Vitis.
+- - [package](utils/templates/package.py) - Python script for generating a TCL
+    script for packaging an RTL kernel into an `.xo` file.
+- - [synth](utils/templates/synth.py) - Python script for generating a TCL
+    script for elaborating and synthesizing RTL kernels for finding errors,
+    such as syntax errors.
+- [utils.mk](utils/utils.mk) (deprecated) - Makefile for building all of the
+  projects.
