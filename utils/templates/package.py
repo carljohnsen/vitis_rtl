@@ -208,6 +208,8 @@ if __name__ == '__main__':
     for name, info in config['ip_cores'].items():
         ip_cores += create(name, info['vendor'], info['version'], info['module_name'])
         ip_cores += set_params(info['params'], info['module_name'])
+    if ip_cores != '':
+        ip_cores += 'generate_target all [get_ips]\n'
 
     addr = 0x10
     scalars = ''
