@@ -1,10 +1,20 @@
 cmake_minimum_required(VERSION 3.1.5)
+
 project(byteswap)
 set (RTL_KERNELS byteswap)
+
 if (NOT DEFINED VPP_TARGET)
     set (VPP_TARGET hw_emu)
 endif()
 
-get_filename_component(PARENT_DIR "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
-set(UTILS_DIR "${PARENT_DIR}/utils")
-include ("${UTILS_DIR}/CMakeLists.txt")
+if (NOT DEFINED HLSLIB_DIR)
+    get_filename_component(PARENT_DIR "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
+    set(HLSLIB_DIR "${PARENT_DIR}/hlslib")
+endif()
+
+if (NOT DEFINED RTLLIB_DIR)
+    get_filename_component(PARENT_DIR "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
+    set(RTLLIB_DIR "${PARENT_DIR}/rtllib")
+endif()
+
+include ("${RTLLIB_DIR}/cmake/CMakeLists.txt")

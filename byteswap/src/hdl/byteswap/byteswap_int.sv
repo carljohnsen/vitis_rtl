@@ -169,7 +169,7 @@ assign ap_ready = ap_done;
 wire read_done;
 wire write_done;
 
-axi_read_master_ch #(
+axi_read_master #(
     .C_ADDR_WIDTH        ( C_M_AXI_GMEM_ADDR_WIDTH ),
     .C_DATA_WIDTH        ( C_M_AXI_GMEM_DATA_WIDTH ),
     .C_ID_WIDTH          ( C_M_AXI_GMEM_ID_WIDTH ),
@@ -232,7 +232,7 @@ inst_swapper  (
 );
 
 // AXI4 Write Master
-axi_write_master_ch #(
+axi_write_master #(
     .C_ADDR_WIDTH        ( C_M_AXI_GMEM_ADDR_WIDTH ),
     .C_DATA_WIDTH        ( C_M_AXI_GMEM_DATA_WIDTH ),
     .C_MAX_LENGTH_WIDTH  ( C_XFER_SIZE_WIDTH ),

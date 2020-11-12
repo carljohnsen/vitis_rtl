@@ -1,3 +1,6 @@
 [submodule "hlslib"]
 	path = hlslib
 	url = git@github.com:definelicht/hlslib.git
+[submodule "rtllib"]
+	path = rtllib
+	url = git@github.com:carljohnsen/rtllib.git
