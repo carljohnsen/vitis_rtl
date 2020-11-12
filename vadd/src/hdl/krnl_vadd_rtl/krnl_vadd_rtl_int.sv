@@ -246,7 +246,7 @@ inst_krnl_vadd_control_s_axi (
 );
 
 // AXI4 Read Master
-axi_read_master_ch #(
+axi_read_master #(
     .C_ADDR_WIDTH        ( C_M_AXI_GMEM_ADDR_WIDTH ),
     .C_DATA_WIDTH        ( C_M_AXI_GMEM_DATA_WIDTH ),
     .C_ID_WIDTH          ( C_M_AXI_GMEM_ID_WIDTH ),
@@ -303,7 +303,7 @@ inst_adder (
 );
 
 // AXI4 Write Master
-axi_write_master_ch #(
+axi_write_master #(
     .C_ADDR_WIDTH        ( C_M_AXI_GMEM_ADDR_WIDTH ),
     .C_DATA_WIDTH        ( C_M_AXI_GMEM_DATA_WIDTH ),
     .C_MAX_LENGTH_WIDTH  ( LP_LENGTH_WIDTH ),

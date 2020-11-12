@@ -40,9 +40,9 @@ int main(int argc, char **argv) {
     auto ina = context.MakeBuffer<float, hlslib::ocl::Access::read>(
             hlslib::ocl::MemoryBank::bank0, size);
     auto inb = context.MakeBuffer<float, hlslib::ocl::Access::read>(
-            hlslib::ocl::MemoryBank::bank1, size);
+            hlslib::ocl::MemoryBank::bank0, size);
     auto out = context.MakeBuffer<float, hlslib::ocl::Access::write>(
-            hlslib::ocl::MemoryBank::bank2, size);
+            hlslib::ocl::MemoryBank::bank0, size);
 
     // Copy to device
     ina.CopyFromHost(input_a.begin());

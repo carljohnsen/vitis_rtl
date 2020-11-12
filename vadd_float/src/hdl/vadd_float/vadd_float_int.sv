@@ -258,7 +258,7 @@ assign ap_idle = ap_idle_r;
 assign ap_ready = ap_done;
 
 // AXI4 Read Master a
-axi_read_master_ch #(
+axi_read_master #(
     .C_ADDR_WIDTH        ( C_M_AXI_ADDR_WIDTH ),
     .C_DATA_WIDTH        ( C_M_AXI_DATA_WIDTH ),
     .C_ID_WIDTH          ( C_M_AXI_ID_WIDTH ),
@@ -298,7 +298,7 @@ inst_axi_read_master_a (
 );
 
 // AXI4 Read Master b
-axi_read_master_ch #(
+axi_read_master #(
     .C_ADDR_WIDTH        ( C_M_AXI_ADDR_WIDTH ),
     .C_DATA_WIDTH        ( C_M_AXI_DATA_WIDTH ),
     .C_ID_WIDTH          ( C_M_AXI_ID_WIDTH ),
@@ -361,7 +361,7 @@ inst_adder  (
 );
 
 // AXI4 Write Master
-axi_write_master_ch #(
+axi_write_master #(
     .C_ADDR_WIDTH        ( C_M_AXI_ADDR_WIDTH ),
     .C_DATA_WIDTH        ( C_M_AXI_DATA_WIDTH ),
     .C_MAX_LENGTH_WIDTH  ( C_XFER_SIZE_WIDTH ),
