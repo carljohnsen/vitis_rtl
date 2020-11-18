@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
     // Create the kernels
     auto kernel_ina = program.MakeKernel("reader", ina, size);
     auto kernel_inb = program.MakeKernel("reader", inb, size);
-    auto kernel_vadd = program.MakeKernel("vadd_float");
+    auto kernel_vadd = program.MakeKernel("vadd_float_top");
     auto kernel_out = program.MakeKernel("writer", out);
 
     // Execute kernels
