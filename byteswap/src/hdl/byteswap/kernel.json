@@ -1,8 +1,8 @@
 {
     "name" : "byteswap",
-    "buses" : [
-        "m_axi_gmem"
-    ],
+    "buses" : {
+        "gmem" : "m_axi"
+    },
     "params" : {
         "scalars" : {
             "xfer_size" : 32

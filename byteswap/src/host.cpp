@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
     gmem.CopyFromHost(input_data.begin());
 
     // Create the kernel
-    auto kernel = program.MakeKernel("byteswap", size, gmem);
+    auto kernel = program.MakeKernel("byteswap_top", size, gmem);
 
     // Execute kernel
     const auto elapsed = kernel.ExecuteTask();
