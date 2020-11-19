@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
     b.CopyFromHost(input_b.begin());
 
     // Create the kernel
-    auto kernel = program.MakeKernel("vadd_float", size, a, b, c);
+    auto kernel = program.MakeKernel("vadd_float_top", size, a, b, c);
 
     // Execute kernel
     const auto elapsed = kernel.ExecuteTask();

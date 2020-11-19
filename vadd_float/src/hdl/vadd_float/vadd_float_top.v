@@ -1,7 +1,7 @@
 `default_nettype none
 `timescale 1 ns / 1 ps
 
-module vadd_float #(
+module vadd_float_top #(
     parameter integer C_S_AXI_CONTROL_ADDR_WIDTH = 12,
     parameter integer C_S_AXI_CONTROL_DATA_WIDTH = 32,
     parameter integer C_M_AXI_ADDR_WIDTH         = 64,

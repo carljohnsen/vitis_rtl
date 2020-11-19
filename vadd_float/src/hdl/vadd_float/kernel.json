@@ -1,10 +1,10 @@
 {
     "name" : "vadd_float",
-    "buses" : [
-        "m_axi_a",
-        "m_axi_b",
-        "m_axi_result"
-    ],
+    "buses" : {
+        "a" : "m_axi",
+        "b" : "m_axi",
+        "result" : "m_axi"
+    },
     "params" : {
         "scalars" : {
             "xfer_size" : 32
@@ -16,10 +16,10 @@
         }
     },
     "ip_cores" : {
-        "floating_point" : {
+        "floating_point_0" : {
             "vendor" : "xilinx.com",
             "version" : "7.1",
-            "module_name" : "floating_point_0",
+            "name" : "floating_point",
             "params" : {
                 "CONFIG.Add_Sub_Value" : "Add",
                 "CONFIG.Has_ARESETn" : "true",
