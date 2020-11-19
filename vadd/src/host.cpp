@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
     buffer_input2.CopyFromHost(input_data2.begin());
 
     // Create the kernel
-    auto kernel = program.MakeKernel("krnl_vadd_rtl", size, buffer_input1, buffer_input2, buffer_result);
+    auto kernel = program.MakeKernel("krnl_vadd_rtl_top", size, buffer_input1, buffer_input2, buffer_result);
 
     // Execute kernel
     const auto elapsed = kernel.ExecuteTask();

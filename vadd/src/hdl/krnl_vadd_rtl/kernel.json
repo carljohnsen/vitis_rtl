@@ -1,8 +1,8 @@
 {
     "name" : "krnl_vadd_rtl",
-    "buses" : [
-        "m_axi_gmem"
-    ],
+    "buses" : {
+        "gmem": "m_axi"
+    },
     "params" : {
         "scalars" : {
             "length_r" : 32
